@@ -1,0 +1,78 @@
+{% include "admin/edit_inline/tabular.html" %}
+
+
+<style type="text/css" media="screen">
+    .sorthandle
+    {
+        cursor: pointer;
+    }
+</style>
+
+
+<script type="text/javascript" charset="utf-8">
+(function ($) {
+$(document).ready(function() {
+
+    var order_array = [];
+    $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original td.sort_order :input").each(function() {
+            var id = $(this).val();
+            order_array.push(id);
+            $(this).parent().append("<span id='{{ inline_admin_formset.formset.prefix }}-neworder-" + id + "' class='sorthandle'>Order</span>");;
+            $(this).hide();
+        });
+
+
+    // Steal the draghandle's id and apply to the row
+    $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original").each(function() {
+        var id = $(".sorthandle", this).attr("id");
+        $(this).attr("id", id);
+        $(".sorthandle", this).attr("id", "");
+        //take it off the child
+    });
+
+    $(".sorthandle").parent().addClass("sorthandletd").css("cursor", "pointer");
+
+    $(".sorthandle").html("<img src='{{ STATIC_URL }}admin/img/drag_handle.gif' width='11' height='11' alt='Drag to reorder' />");
+
+    // Force a width onto all the tds (so they drag nicely)
+    $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original > *").each(function() {
+        $(this).width($(this).width())
+    })
+
+    // Do the draggable
+    $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody").sortable({
+        'axis': 'y',
+        // 'containment': 'parent',
+        'cursor': 'crosshair',
+        'items': 'tr.has_original',
+        'handle': '.sorthandletd',
+        'forcePlaceholderSize': true,
+        'update': function(sorted) {
+
+            var cereal = $(this).sortable("serialize");
+            //console.log(cereal);
+
+            var classflip = 1;
+            var i = 0;
+            $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original").each(function() {
+                // redraw the table striping
+                $(this).removeClass("row1 row2");
+                if (classflip) {
+                    $(this).addClass("row1");
+                }
+                else {
+                    $(this).addClass("row2");
+                }
+                classflip = !classflip;
+
+                $(" td.sort_order :input", this).val(order_array[i]);
+                i += 1;
+            });
+
+        }
+
+    });
+});
+})($ || django.jQuery);
+
+</script>

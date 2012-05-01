@@ -1,0 +1,87 @@
+{% extends "admin/change_list.html" %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style type="text/css" media="screen">
+    .sorthandle
+    {
+        cursor: pointer;
+    }
+</style>
+
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<script type="text/javascript" charset="utf-8">
+(function ($) {
+    $(document).ready(function() {
+        // Only add the drag-n-drop reordering if this is not a paginated object (determined by the presense of a span, which isn't the best way to do it…)
+        if ($("p.paginator > span"))
+        {
+
+            // Steal the draghandle's id and apply to the row
+            $("#changelist table tbody tr").each(function() {
+                var id = $(".sorthandle", this).attr("id");
+                $(this).attr("id", id);
+                $(".sorthandle", this).attr("id", "");
+                //take it off the child
+            });
+
+            $(".sorthandle").parent().addClass("sorthandletd").css("cursor", "pointer");
+
+            $(".sorthandle").html("<img src='{{ STATIC_URL }}admin/img/drag_handle.gif' width='11' height='11' alt='Drag to reorder' />");
+
+            // Force a width onto all the tds (so they drag nicely)
+            $("#changelist table tbody tr > *").each(function() {
+                $(this).width($(this).width())
+            });
+
+            // Do the draggable
+            $("#changelist table tbody").sortable({
+                'axis': 'y',
+                // 'containment': 'parent',
+                'cursor': 'crosshair',
+                'handle': '.sorthandletd',
+                'forcePlaceholderSize': true,
+                'update': function(sorted) {
+
+                    var cereal = $(this).sortable("serialize");
+                    cereal += '&csrfmiddlewaretoken=' + $("input[name=csrfmiddlewaretoken]").val();
+
+                    var classflip = 1;
+                    $("#changelist table tbody tr").each(function() {
+                        // redraw the tabel striping
+                        $(this).removeClass("row1 row2");
+                        if (classflip) {
+                            $(this).addClass("row1");
+                        }
+                        else {
+                            $(this).addClass("row2");
+                        }
+                        classflip = !classflip;
+
+                    });
+
+
+                    $.ajax({
+                        url: "reorder/",
+                        type: "POST",
+                        data: cereal/*,
+                         success: function(feedback) {
+                         console.log(feedback);
+                         // $('data').html(feedback);
+                         }*/
+                    });
+                }
+
+            });
+
+        }
+    });
+})($ || django.jQuery);
+</script>
+
+
+{% endblock %}
