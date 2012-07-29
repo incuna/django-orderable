@@ -1,18 +1,22 @@
-from django.http import HttpResponse
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 
+
 csrf_protect_m = method_decorator(csrf_protect)
 
+
 class OrderableAdmin(admin.ModelAdmin):
-    
-    """jQuery orderable objects in the admin. You'll want your object to subclass
-    incuna.db.models.Orderable and you want to add sort_order_display to list_display"""
-    
-    list_display = ('__str__','sort_order_display', )
-    
+    """
+    jQuery orderable objects in the admin.
+
+    You'll want your object to subclass incuna.db.models.Orderable and you
+    want to add sort_order_display to list_display.
+    """
+    list_display = ('__str__', 'sort_order_display')
+
     change_list_template = "admin/orderable_change_list.html"
 
     def get_urls(self):
@@ -40,7 +44,7 @@ class OrderableAdmin(admin.ModelAdmin):
 
         if not self.has_change_permission(request):
             raise PermissionDenied
-            
+
         if request.method == "POST":
             neworder = 1
             for object_id in request.POST.getlist('neworder[]'):
@@ -48,13 +52,14 @@ class OrderableAdmin(admin.ModelAdmin):
                 obj.sort_order = neworder
                 obj.save()
                 neworder += 1
-        
+
         return HttpResponse("OK")
 
 
 class OrderableTabularInline(admin.TabularInline):
+    """
+    jQuery orderable objects in the admin.
 
-    """jQuery orderable objects in the admin. You'll want your object to subclass
-    incuna.db.models.Orderable """
-
+    You'll want your object to subclass incuna.db.models.Orderable.
+    """
     template = "admin/edit_inline/orderable_tabular.html"
