@@ -1,4 +1,6 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db import transaction
 
 
 class Orderable(models.Model):
@@ -6,13 +8,13 @@ class Orderable(models.Model):
     If there's a unique_together which includes the sort_order field then that
     will be used when checking for collisions etc.
 
-    This  works well for inlines, which can be manually reordered by entering
+    This works well for inlines, which can be manually reordered by entering
     numbers, and the save function will prevent against collisions.
 
     For main objects, you would want to also use "OrderableAdmin", which will
     make a nice jquery admin interface.
     """
-    sort_order = models.IntegerField(default=0, blank=True)
+    sort_order = models.IntegerField(blank=True)
 
     class Meta:
         abstract = True
@@ -48,49 +50,95 @@ class Orderable(models.Model):
         return obj.objects
 
     def next(self):
+        if not self.sort_order:
+            return None
         objects = self.get_filtered_manager()
         try:
-            next = objects.filter(sort_order__gt=self.sort_order).order_by('sort_order')[0]
-            return next
-        except IndexError:
+            return objects.get(sort_order=self.sort_order + 1)
+        except ObjectDoesNotExist:
             return None
 
     def prev(self):
+        if not self.sort_order:
+            return None
         objects = self.get_filtered_manager()
         try:
-            prev = objects.filter(sort_order__lt=self.sort_order).order_by('-sort_order')[0]
-            return prev
-        except IndexError:
+            return objects.get(sort_order=self.sort_order + 1)
+        except ObjectDoesNotExist:
             return None
 
+    @transaction.commit_on_success()
     def save(self, *args, **kwargs):
-        """All sorts of database-heavy jiggery-pokery which will keep the unique order in sync."""
-        obj = type(self)
+        """Keep the unique order in sync. In transaction to avoid race conditions."""
         objects = self.get_filtered_manager()
+        to_shift = objects.exclude(pk=self.pk) if self.pk else objects
+        old_pos = getattr(self, '_original_sort_order', None)
+        new_pos = self.sort_order
+
+        def _move_to_end(commit=True):
+            """Temporarily save `self.sort_order` elsewhere (max_obj)."""
+            max_obj = objects.all().aggregate(models.Max('sort_order'))['sort_order__max']
+            self.sort_order = max_obj + 1 if max_obj else 1  # May be overwritten later.
+            if commit:
+                super(Orderable, self).save(*args, **kwargs)
+
+        def _move_back():
+            """Reset the position of `self.sort_order` before saving."""
+            self.sort_order = new_pos
+
+        # If not set, insert at end.
         if not self.sort_order:
-            try:
-                max_obj = objects.all().order_by('-sort_order')[0]
-                self.sort_order = max_obj.sort_order + 1
-            except IndexError:
-                self.sort_order = 1
+            _move_to_end(commit=False)
 
-        # try and get any collisions
-        try:
-            collision = objects.exclude(pk=self.pk).get(sort_order=self.sort_order)
-            to_shift_objs = objects.filter(sort_order__gte=self.sort_order).order_by('-sort_order')
+        # New insert.
+        elif not old_pos:
+            _move_to_end()
+            # Increment `sort_order` on objects with:
+            #     sort_order > new_pos.
+            to_shift.filter(sort_order__gte=self.sort_order)
+            to_shift.update(sort_order=models.F('sort_order') + 1)
+            _move_back()
 
-            for to_shift in to_shift_objs:
-                to_shift.sort_order += 1
-                to_shift.save()
+        # self.sort_order decreased.
+        elif new_pos < old_pos:
+            _move_to_end()
+            # Increment `sort_order` on objects with:
+            #     sort_order >= new_pos and sort_order < old_pos
+            to_shift = to_shift.filter(sort_order__gte=new_pos, sort_order__lt=old_pos)
+            to_shift.update(sort_order=models.F('sort_order') + 1)
+            _move_back()
 
-        except obj.DoesNotExist:
-            #all good
-            pass
+        # self.sort_order increased.
+        elif new_pos > old_pos:
+            _move_to_end()
+            # Decrement sort_order on objects with:
+            #     sort_order <= new_pos and sort_order > old_pos.
+            to_shift = to_shift.filter(sort_order__lte=new_pos, sort_order__gt=old_pos)
+            to_shift.update(sort_order=models.F('sort_order') - 1)
+            _move_back()
 
-        super(Orderable, self).save(*args, **kwargs)  # Call the "real" save() method.
+        # Call the "real" save() method.
+        super(Orderable, self).save(*args, **kwargs)
 
     def sort_order_display(self):
         return "<span id='neworder-%s' class='sorthandle'>%s</span>" % (self.id, self.sort_order)
     sort_order_display.allow_tags = True
     sort_order_display.short_description = 'Order'
     sort_order_display.admin_order_field = 'sort_order'
+
+    def __setattr__(self, attr, value):
+        """
+        When a change is made to the `sort_order`, save the original value.
+
+        Greatly inspired by http://code.google.com/p/django-audit/
+        """
+        try:
+            current = getattr(self, attr)
+        except ObjectDoesNotExist:
+            pass
+        except AttributeError:
+            pass
+        else:
+            if attr == 'sort_order' and current != value and not getattr(self, '_original_sort_order', False):
+                self._original_sort_order = current
+        super(Orderable, self).__setattr__(attr, value)

@@ -6,6 +6,9 @@
     {
         cursor: pointer;
     }
+    .ui-sortable-placeholder{
+        height: 50px;
+    }
 </style>
 
 
@@ -14,7 +17,7 @@
 $(document).ready(function() {
 
     var order_array = [];
-    $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original td.sort_order :input").each(function() {
+    $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original td.field-sort_order :input").each(function() {
             var id = $(this).val();
             order_array.push(id);
             $(this).parent().append("<span id='{{ inline_admin_formset.formset.prefix }}-neworder-" + id + "' class='sorthandle'>Order</span>");;
@@ -65,7 +68,7 @@ $(document).ready(function() {
                 }
                 classflip = !classflip;
 
-                $(" td.sort_order :input", this).val(order_array[i]);
+                $(" td.field-sort_order :input", this).val(order_array[i]);
                 i += 1;
             });
 
