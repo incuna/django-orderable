@@ -109,7 +109,7 @@ class Orderable(models.Model):
             _move_back()
 
         # self.sort_order increased.
-        elif new_pos > old_pos:
+        elif old_pos and new_pos > old_pos:
             _move_to_end()
             # Decrement sort_order on objects with:
             #     sort_order <= new_pos and sort_order > old_pos.
