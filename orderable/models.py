@@ -91,7 +91,7 @@ class Orderable(models.Model):
             _move_to_end(commit=False)
 
         # New insert.
-        elif not old_pos:
+        elif not self.pk and not old_pos:
             _move_to_end()
             # Increment `sort_order` on objects with:
             #     sort_order > new_pos.
