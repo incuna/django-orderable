@@ -63,7 +63,7 @@ class Orderable(models.Model):
             return None
         objects = self.get_filtered_manager()
         try:
-            return objects.get(sort_order=self.sort_order + 1)
+            return objects.get(sort_order=self.sort_order - 1)
         except ObjectDoesNotExist:
             return None
 
