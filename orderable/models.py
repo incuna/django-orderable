@@ -101,7 +101,7 @@ class Orderable(models.Model):
             _move_to_end()
             # Increment `sort_order` on objects with:
             #     sort_order > new_pos.
-            to_shift.filter(sort_order__gte=self.sort_order)
+            to_shift = to_shift.filter(sort_order__gte=self.sort_order)
             to_shift.update(sort_order=models.F('sort_order') + 1)
             _move_back()
 
