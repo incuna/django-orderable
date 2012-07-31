@@ -69,7 +69,13 @@ class Orderable(models.Model):
 
     @transaction.commit_on_success()
     def save(self, *args, **kwargs):
-        """Keep the unique order in sync. In transaction to avoid race conditions."""
+        """
+        Keep the unique order in sync.
+
+        In transaction to avoid race conditions.
+
+        WARNING: Intensive giggery-pokery zone.
+        """
         objects = self.get_filtered_manager()
         to_shift = objects.exclude(pk=self.pk) if self.pk else objects
         old_pos = getattr(self, '_original_sort_order', None)
