@@ -54,8 +54,8 @@ class Orderable(models.Model):
             return None
         objects = self.get_filtered_manager()
         try:
-            return objects.get(sort_order=self.sort_order + 1)
-        except ObjectDoesNotExist:
+            return objects.filter(sort_order__gt=self.sort_order).order_by('sort_order')[0]
+        except IndexError:
             return None
 
     def prev(self):
@@ -63,8 +63,8 @@ class Orderable(models.Model):
             return None
         objects = self.get_filtered_manager()
         try:
-            return objects.get(sort_order=self.sort_order - 1)
-        except ObjectDoesNotExist:
+            return objects.filter(sort_order__lt=self.sort_order).order_by('-sort_order')[0]
+        except IndexError:
             return None
 
     @transaction.commit_on_success()
