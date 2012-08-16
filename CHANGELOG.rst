@@ -1,3 +1,7 @@
+v1.1.1
+======
+* Don't fall over on KeyError.
+
 v1.1
 ====
 
