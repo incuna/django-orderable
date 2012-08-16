@@ -140,9 +140,7 @@ class Orderable(models.Model):
         """
         try:
             current = getattr(self, attr)
-        except ObjectDoesNotExist:
-            pass
-        except AttributeError:
+        except (AttributeError, KeyError, ObjectDoesNotExist):
             pass
         else:
             if attr == 'sort_order' and current != value and not getattr(self, '_original_sort_order', False):
