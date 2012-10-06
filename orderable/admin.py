@@ -20,7 +20,11 @@ class OrderableAdmin(admin.ModelAdmin):
     change_list_template = "admin/orderable_change_list.html"
 
     def get_urls(self):
-        from django.conf.urls import url
+        try:
+            from django.conf.urls.defaults import url
+        except ImportError:
+            from django.conf.urls import url
+
         patterns = super(OrderableAdmin, self).get_urls()
         patterns.insert(
                 -1,     # insert just before (.+) rule (see django.contrib.admin.options.ModelAdmin.get_urls)
