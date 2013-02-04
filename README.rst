@@ -59,3 +59,26 @@ You need jQuery 1.2+ and jQuery UI 1.5+ available in the Admin for the actual mo
                 'path/to/jquery.ui.js',
             )
 
+
+Common Gotchas
+--------------
+
+Adding Orderable to Existing Models
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You will need to populate the required `sort_order` field. Typically this is done by adding the
+field in one migration with a default of `0` then creating a data migration to set it's value to
+that of it's primary key::
+
+    for obj in orm['appname.Model'].objects.all():
+        obj.sort_order = obj.pk
+        obj.save()
+
+
+Multiple Models using Orderable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+When multiple models inherit from Orderable the `next()` and `previous()` methods will look for the
+next/previous model with a sort order. However you'll likely want to have the various sort orders
+determined by a foreign key or some other predicate. The easiest way (currently) is to override the
+method in question.
