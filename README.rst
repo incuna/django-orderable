@@ -28,6 +28,9 @@ Add to your INSTALLED_APPS: ::
 
 Subclass the Orderable class: ::
 
+    from orderable.models import Orderable
+
+
     class Book(Orderable):
         ...
 
@@ -36,6 +39,9 @@ Note: If your subclass of Orderable has a Metaclass then make sure it subclasses
 
 
 Subclass the appropriate Orderable admin classes: ::
+
+    from orderable.admin import OrderableAdmin, OrderableTabularInline
+
 
     class SomeInlineClass(OrderableTabularInline):
         ...
