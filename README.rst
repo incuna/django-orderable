@@ -47,6 +47,7 @@ Subclass the appropriate Orderable admin classes: ::
         ...
 
     class SomeAdminClass(OrderableAdmin):
+        list_display = ('__unicode__', 'sort_order_display')
         ...
 
 
