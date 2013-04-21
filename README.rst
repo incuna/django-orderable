@@ -67,8 +67,8 @@ Adding Orderable to Existing Models
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will need to populate the required `sort_order` field. Typically this is done by adding the
-field in one migration with a default of `0` then creating a data migration to set it's value to
-that of it's primary key::
+field in one migration with a default of `0`, then creating a data migration to set the value to
+that of its primary key::
 
     for obj in orm['appname.Model'].objects.all():
         obj.sort_order = obj.pk
