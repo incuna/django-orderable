@@ -138,11 +138,12 @@ class Orderable(models.Model):
 
         Greatly inspired by http://code.google.com/p/django-audit/
         """
-        try:
-            current = getattr(self, attr)
-        except (AttributeError, KeyError, ObjectDoesNotExist):
-            pass
-        else:
-            if attr == 'sort_order' and current != value and not getattr(self, '_original_sort_order', False):
-                self._original_sort_order = current
+        if attr == 'sort_order':
+            try:
+                current = getattr(self, attr)
+            except (AttributeError, KeyError, ObjectDoesNotExist):
+                pass
+            else:
+                if current != value and not getattr(self, '_original_sort_order', False):
+                    self._original_sort_order = current
         super(Orderable, self).__setattr__(attr, value)
