@@ -1,6 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models
-from django.db import transaction
+from django.db import models, transaction
 
 
 class Orderable(models.Model):
@@ -67,12 +66,11 @@ class Orderable(models.Model):
         except IndexError:
             return None
 
-    @transaction.commit_on_success()
     def save(self, *args, **kwargs):
         """
         Keep the unique order in sync.
 
-        In transaction to avoid race conditions.
+        Expects to be run in a transaction to avoid race conditions.
 
         WARNING: Intensive giggery-pokery zone.
         """
@@ -125,6 +123,12 @@ class Orderable(models.Model):
 
         # Call the "real" save() method.
         super(Orderable, self).save(*args, **kwargs)
+
+    # Make the save method atomic on django 1.6+
+    try:
+        save = transaction.atomic(save)
+    except AttributeError:
+        pass
 
     def sort_order_display(self):
         return "<span id='neworder-%s' class='sorthandle'>%s</span>" % (self.id, self.sort_order)

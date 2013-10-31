@@ -1,16 +1,14 @@
 from setuptools import find_packages, setup
 
-from orderable import get_version
-
 
 setup(
     name='django-orderable',
     packages=find_packages(),
     include_package_data=True,
-    version=get_version(),
+    version='2.0.0',
     description='Orderable model and admin',
     author='Incuna Ltd',
     author_email='dev@incuna.com',
-    url='http://incuna.com/',
+    url='https://github.com/incuna/django-orderable',
     long_description=open('README.rst').read(),
 )
