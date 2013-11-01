@@ -8,7 +8,10 @@ env:
   - DJANGO=django==1.5.5
   - DJANGO=https://github.com/django/django/archive/stable/1.6.x.zip
 install:
+  - psql -c 'CREATE DATABASE orderable' -U postgres;
   - pip install $DJANGO --use-mirrors
   - pip install -r test_requirements.txt
   - pip install -e .
 script: "python orderable/tests/run.py"
+notifications:
+  email: false
