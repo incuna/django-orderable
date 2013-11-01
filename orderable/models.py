@@ -96,7 +96,6 @@ class Orderable(models.Model):
 
         # New insert.
         elif not self.pk and not old_pos:
-            _move_to_end()
             # Increment `sort_order` on objects with:
             #     sort_order > new_pos.
             to_shift = to_shift.filter(sort_order__gte=self.sort_order)
