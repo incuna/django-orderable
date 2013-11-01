@@ -25,7 +25,6 @@ Add to your INSTALLED_APPS: ::
     'orderable',
     ...
 
-
 Subclass the Orderable class: ::
 
     from orderable.models import Orderable
@@ -35,7 +34,13 @@ Subclass the Orderable class: ::
         ...
 
 
-Note: If your subclass of Orderable has a Metaclass then make sure it subclasses the Orderable one so the model is sorted by ``sort_order``.
+**Note:** If your subclass of Orderable has a Metaclass then make sure it subclasses the Orderable one so the model is sorted by ``sort_order``.
+
+** *Also* Note:** Saving orderable models invokes a fair number of queries and
+in order to avoid race conditions should be run in a transaction. If you're
+using django >= 1.6 we recommend you set `ATOMIC_REQUESTS=True` in your
+settings, if you're not yet on django 1.6, we recommend use of
+`TransactionMiddleware`.
 
 
 Subclass the appropriate Orderable admin classes: ::

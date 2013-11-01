@@ -1,3 +1,10 @@
+v2.0.1
+======
+
+* Added tests to `Orderable.save`
+* Removed `django.db.transation.atomic` from the save method in django 1.6.
+* Reduced number of queries on insert of new `Orderable`.
+
 v2.0.0
 ======
 
@@ -7,12 +14,10 @@ v2.0.0
   because it can cause database transactions to be commited that would
   otherwise have been rolled back.
 
-  If you're using Django 1.6+ we have wrapped the save method in
-  `django.db.transaction.atomic` for you (but you are using `ATOMIC_REQUESTS`,
-  right?). Otherwise, we recommend you make sure to use
-  'django.middleware.transaction.TransactionMiddleware', or at least use
-  `django.db.transaction.commit_on_success` on any code that invokes the save
-  method as it would otherwise be vulnerable to race conditions.
+  We recommend you make sure to use 'django.middleware.transaction.TransactionMiddleware', or at least use `django.db.transaction.commit_on_success` on any code that invokes the save method as it would otherwise be vulnerable to race conditions. If you are on django 1.6 we would instead recommend setting `settings.ATOMIC_REQUESTS = True`.
+
+  This version added `django.db.transation.atomic` to `Orderable.save` method
+  (in django 1.6 only) but it was immediately removed in `2.0.1`.
 
 v1.2.0
 ======
