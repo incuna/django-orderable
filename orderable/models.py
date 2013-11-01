@@ -86,7 +86,7 @@ class Orderable(models.Model):
             if commit:
                 super(Orderable, self).save(*args, **kwargs)
 
-        def _move_back():
+        def _move_to_new_pos():
             """Reset the position of `self.sort_order` before saving."""
             self.sort_order = new_pos
 
@@ -96,21 +96,20 @@ class Orderable(models.Model):
 
         # New insert.
         elif not self.pk and not old_pos:
-            _move_to_end()
             # Increment `sort_order` on objects with:
             #     sort_order > new_pos.
             to_shift = to_shift.filter(sort_order__gte=self.sort_order)
             to_shift.update(sort_order=models.F('sort_order') + 1)
-            _move_back()
+            _move_to_new_pos()
 
         # self.sort_order decreased.
-        elif new_pos < old_pos:
+        elif old_pos and new_pos < old_pos:
             _move_to_end()
             # Increment `sort_order` on objects with:
             #     sort_order >= new_pos and sort_order < old_pos
             to_shift = to_shift.filter(sort_order__gte=new_pos, sort_order__lt=old_pos)
             to_shift.update(sort_order=models.F('sort_order') + 1)
-            _move_back()
+            _move_to_new_pos()
 
         # self.sort_order increased.
         elif old_pos and new_pos > old_pos:
@@ -119,16 +118,10 @@ class Orderable(models.Model):
             #     sort_order <= new_pos and sort_order > old_pos.
             to_shift = to_shift.filter(sort_order__lte=new_pos, sort_order__gt=old_pos)
             to_shift.update(sort_order=models.F('sort_order') - 1)
-            _move_back()
+            _move_to_new_pos()
 
         # Call the "real" save() method.
         super(Orderable, self).save(*args, **kwargs)
-
-    # Make the save method atomic on django 1.6+
-    try:
-        save = transaction.atomic(save)
-    except AttributeError:
-        pass
 
     def sort_order_display(self):
         return "<span id='neworder-%s' class='sorthandle'>%s</span>" % (self.id, self.sort_order)

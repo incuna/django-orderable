@@ -5,7 +5,7 @@ setup(
     name='django-orderable',
     packages=find_packages(),
     include_package_data=True,
-    version='2.0.0',
+    version='2.0.1',
     description='Orderable model and admin',
     author='Incuna Ltd',
     author_email='dev@incuna.com',
