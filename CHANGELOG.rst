@@ -10,14 +10,14 @@ v2.0.0
 
 * Don't use `commit_on_success` in model save.
 
-**Warning:** Potentially backwards incompatible. We have removed this feature
-  because it can cause database transactions to be commited that would
-  otherwise have been rolled back.
+**Warning** Potentially backwards incompatible. We have removed this feature
+because it can cause database transactions to be commited that would
+otherwise have been rolled back.
 
-  We recommend you make sure to use 'django.middleware.transaction.TransactionMiddleware', or at least use `django.db.transaction.commit_on_success` on any code that invokes the save method as it would otherwise be vulnerable to race conditions. If you are on django 1.6 we would instead recommend setting `settings.ATOMIC_REQUESTS = True`.
+We recommend you make sure to use 'django.middleware.transaction.TransactionMiddleware', or at least use `django.db.transaction.commit_on_success` on any code that invokes the save method as it would otherwise be vulnerable to race conditions. If you are on django 1.6 we would instead recommend setting `settings.ATOMIC_REQUESTS = True`.
 
-  This version added `django.db.transation.atomic` to `Orderable.save` method
-  (in django 1.6 only) but it was immediately removed in `2.0.1`.
+This version added `django.db.transation.atomic` to `Orderable.save` method
+(in django 1.6 only) but it was immediately removed in `2.0.1`.
 
 v1.2.0
 ======
