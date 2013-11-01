@@ -123,12 +123,6 @@ class Orderable(models.Model):
         # Call the "real" save() method.
         super(Orderable, self).save(*args, **kwargs)
 
-    # Make the save method atomic on django 1.6+
-    try:
-        save = transaction.atomic(save)
-    except AttributeError:
-        pass
-
     def sort_order_display(self):
         return "<span id='neworder-%s' class='sorthandle'>%s</span>" % (self.id, self.sort_order)
     sort_order_display.allow_tags = True
