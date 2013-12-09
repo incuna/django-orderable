@@ -1,8 +1,11 @@
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
+from django.db.models import F, Max
 from django.http import HttpResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
+
+from .settings import EDITABLE
 
 
 csrf_protect_m = method_decorator(csrf_protect)
@@ -50,11 +53,19 @@ class OrderableAdmin(admin.ModelAdmin):
             raise PermissionDenied
 
         if request.method == "POST":
+            if not EDITABLE:
+                # To ensure unique values during updates, shift all objects
+                max_obj = model.objects.all().aggregate(Max('sort_order'))['sort_order__max']
+                if max_obj:
+                    model.objects.update(sort_order=F('sort_order') + max_obj + 1)
             neworder = 1
             for object_id in request.POST.getlist('neworder[]'):
-                obj = model.objects.get(pk=object_id)
-                obj.sort_order = neworder
-                obj.save()
+                if EDITABLE:
+                    obj = model.objects.get(pk=object_id)
+                    obj.sort_order = neworder
+                    obj.save()
+                else:
+                    model.objects.filter(pk=object_id).update(sort_order=neworder)
                 neworder += 1
 
         return HttpResponse("OK")

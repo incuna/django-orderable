@@ -1,6 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
 
+from .settings import EDITABLE
+
 
 class Orderable(models.Model):
     """An orderable object that keeps all the instances in an enforced order
@@ -13,7 +15,7 @@ class Orderable(models.Model):
     For main objects, you would want to also use "OrderableAdmin", which will
     make a nice jquery admin interface.
     """
-    sort_order = models.IntegerField(blank=True, db_index=True)
+    sort_order = models.IntegerField(blank=True, db_index=True, editable=EDITABLE)
 
     class Meta:
         abstract = True
