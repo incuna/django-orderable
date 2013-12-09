@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, transaction
+from django.utils.translation import ugettext_lazy as _
 
 from .settings import EDITABLE
 
@@ -128,8 +129,7 @@ class Orderable(models.Model):
     def sort_order_display(self):
         return "<span id='neworder-%s' class='sorthandle'>%s</span>" % (self.id, self.sort_order)
     sort_order_display.allow_tags = True
-    sort_order_display.short_description = 'Order'
-    sort_order_display.admin_order_field = 'sort_order'
+    sort_order_display.short_description = _('Order')
 
     def __setattr__(self, attr, value):
         """
