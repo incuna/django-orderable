@@ -37,7 +37,11 @@ class OrderableAdmin(admin.ModelAdmin):
         return patterns
 
     def get_url_name(self):
-        return '%sadmin_%s_%s_reorder' % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
+        return '{}admin_{}_{}_reorder'.format(
+            self.admin_site.name,
+            self.model._meta.app_label,
+            self.model._meta.model_name,
+        )
 
     @csrf_protect_m
     def reorder_view(self, request):
