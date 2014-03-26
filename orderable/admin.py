@@ -39,10 +39,14 @@ class OrderableAdmin(admin.ModelAdmin):
         return patterns
 
     def get_url_name(self):
+        meta = self.model._meta
+        try:
+            model_name = meta.model_name
+        except AttributeError:
+            model_name = meta.module_name
+
         return '{}admin_{}_{}_reorder'.format(
-            self.admin_site.name,
-            self.model._meta.app_label,
-            self.model._meta.model_name,
+            self.admin_site.name, meta.app_label, model_name,
         )
 
     @csrf_protect_m
