@@ -43,6 +43,7 @@ class OrderableAdmin(admin.ModelAdmin):
         try:
             model_name = meta.model_name
         except AttributeError:
+            # model_name is called module_name in django < 1.6
             model_name = meta.module_name
 
         return '{0}admin_{1}_{2}_reorder'.format(
