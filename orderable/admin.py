@@ -27,24 +27,33 @@ class OrderableAdmin(admin.ModelAdmin):
 
         patterns = super(OrderableAdmin, self).get_urls()
         patterns.insert(
-                -1,     # insert just before (.+) rule (see django.contrib.admin.options.ModelAdmin.get_urls)
-                url(
-                    r'^reorder/$',
-                    self.reorder_view,
-                    name=self.get_url_name()
-                    )
-                )
+            # insert just before (.+) rule
+            # (see django.contrib.admin.options.ModelAdmin.get_urls)
+            -1,
+            url(
+                r'^reorder/$',
+                self.reorder_view,
+                name=self.get_url_name()
+            )
+        )
         return patterns
 
     def get_url_name(self):
-        return '%sadmin_%s_%s_reorder' % (self.admin_site.name, self.model._meta.app_label, self.model._meta.module_name)
+        meta = self.model._meta
+        try:
+            model_name = meta.model_name
+        except AttributeError:
+            # model_name is called module_name in django < 1.6
+            model_name = meta.module_name
+
+        return '{0}admin_{1}_{2}_reorder'.format(
+            self.admin_site.name, meta.app_label, model_name,
+        )
 
     @csrf_protect_m
     def reorder_view(self, request):
         """The 'reorder' admin view for this model."""
         model = self.model
-        opts = model._meta
-        app_label = opts.app_label
 
         if not self.has_change_permission(request):
             raise PermissionDenied
