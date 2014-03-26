@@ -1,3 +1,7 @@
+v2.0.2
+
+* Use model_name instead of deprecated module_name in django >= 1.6
+
 v2.0.1
 ======
 
