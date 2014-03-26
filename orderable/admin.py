@@ -45,7 +45,7 @@ class OrderableAdmin(admin.ModelAdmin):
         except AttributeError:
             model_name = meta.module_name
 
-        return '{}admin_{}_{}_reorder'.format(
+        return '{0}admin_{1}_{2}_reorder'.format(
             self.admin_site.name, meta.app_label, model_name,
         )
 
