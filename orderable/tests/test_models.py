@@ -45,7 +45,7 @@ class TestOrderingOnSave(TestCase):
 
     def test_insert_on_create(self):
         """New insert should bump rest of list along if sort_order specified.
-        
+
         Index:    1      2      3
         Before: old_1  old_2  old_3
         After:  old_1   new   old_2  old_3
@@ -101,7 +101,6 @@ class TestOrderingOnSave(TestCase):
         # Make sure sort_order is still unique
         self.assertEqual(len(tasks), len(set(t.sort_order for t in tasks)))
 
-
     def test_decrease_order(self):
         """Decreasing sort_order should bump those in the middle on.
 
@@ -135,3 +134,9 @@ class TestOrderingOnSave(TestCase):
         self.assertSequenceEqual(tasks, expected)
         # Make sure sort_order is still unique
         self.assertEqual(len(tasks), len(set(t.sort_order for t in tasks)))
+
+    def test_zero_sort_order(self):
+        """Zero should be a valid value for sort_order"""
+
+        zero_task = Task.objects.create(sort_order=0)
+        self.assertEqual(zero_task.sort_order, 0)

@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models, transaction
+from django.db import models
 
 
 class Orderable(models.Model):
@@ -91,7 +91,7 @@ class Orderable(models.Model):
             self.sort_order = new_pos
 
         # If not set, insert at end.
-        if not self.sort_order:
+        if self.sort_order is None:
             _move_to_end(commit=False)
 
         # New insert.
