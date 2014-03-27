@@ -135,3 +135,9 @@ class TestOrderingOnSave(TestCase):
         self.assertSequenceEqual(tasks, expected)
         # Make sure sort_order is still unique
         self.assertEqual(len(tasks), len(set(t.sort_order for t in tasks)))
+
+    def test_zero_sort_order(self):
+        """Zero should be a valid value for sort_order"""
+
+        zero_task = Task.objects.create(sort_order=0)
+        self.assertEqual(zero_task.sort_order, 0)
