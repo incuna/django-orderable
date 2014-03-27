@@ -1,4 +1,10 @@
+v2.0.3
+======
+
+* Accept zero as a valid value for sort_order
+
 v2.0.2
+======
 
 * Use model_name instead of deprecated module_name in django >= 1.6
 
