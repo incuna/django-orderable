@@ -10,4 +10,4 @@ test:
 	python orderable/tests/run.py
 
 release:
-	python setup.py register -r pypi sdist upload -r pypi
+	python setup.py register -r pypi sdist bdist_wheel upload -r pypi
