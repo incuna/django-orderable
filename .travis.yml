@@ -10,7 +10,7 @@ env:
 install:
   - psql -c 'CREATE DATABASE orderable' -U postgres;
   - pip install $DJANGO --use-mirrors
-  - pip install -r test_requirements.txt
+  - pip install -r requirements.txt
   - pip install -e .
 script: "python orderable/tests/run.py"
 notifications:
