@@ -9,7 +9,7 @@ env:
   - DJANGO='django>=1.7,<1.8'
 install:
   - psql -c 'CREATE DATABASE orderable' -U postgres;
-  - pip install $DJANGO --use-mirrors
+  - pip install $DJANGO
   - pip install -r requirements.txt
   - pip install -e .
 script: "make test"
