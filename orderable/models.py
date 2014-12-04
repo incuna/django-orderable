@@ -55,27 +55,17 @@ class Orderable(models.Model):
         if not self.sort_order:
             return None
 
-        objects = self.get_filtered_manager().filter(
+        return self.get_filtered_manager().filter(
             sort_order__gt=self.sort_order
-        ).order_by('sort_order')
-
-        try:
-            return objects[0]
-        except IndexError:
-            return None
+        ).order_by('sort_order').first()
 
     def prev(self):
         if not self.sort_order:
             return None
 
-        objects = self.get_filtered_manager().filter(
+        return self.get_filtered_manager().filter(
             sort_order__lt=self.sort_order
-        ).order_by('-sort_order')
-
-        try:
-            return objects[0]
-        except IndexError:
-            return None
+        ).order_by('-sort_order').first()
 
     def save(self, *args, **kwargs):
         """
