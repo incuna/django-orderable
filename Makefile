@@ -8,7 +8,7 @@ help:
 
 test:
 	@coverage run orderable/tests/run.py
-	@coverage report -m
+	@coverage report -m --fail-under=100
 
 release:
 	python setup.py register -r pypi sdist bdist_wheel upload -r pypi
