@@ -13,6 +13,7 @@ settings.configure(
     INSTALLED_APPS=(
         'orderable.tests',
     ),
+    MIDDLEWARE_CLASSES=[],
 )
 
 
