@@ -19,7 +19,7 @@ class TestOrderingOnSave(TestCase):
             #     UPDATE
             # Queries on django >= 1.6
             #     UPDATE
-            #  See https://docs.djangoproject.com/en/dev/releases/1.6/#model-save-algorithm-changed
+            #  See http://goo.gl/KGz5vC
             task.save()
 
     def test_unspecified_order(self):
@@ -136,7 +136,6 @@ class TestOrderingOnSave(TestCase):
         self.assertEqual(len(tasks), len(set(t.sort_order for t in tasks)))
 
     def test_zero_sort_order(self):
-        """Zero should be a valid value for sort_order"""
-
+        """Zero should be a valid value for sort_order."""
         zero_task = Task.objects.create(sort_order=0)
         self.assertEqual(zero_task.sort_order, 0)
