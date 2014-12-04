@@ -7,7 +7,8 @@ help:
 	@echo " make release -- pushes to pypi"
 
 test:
-	python orderable/tests/run.py
+	@coverage run orderable/tests/run.py
+	@coverage report -m
 
 release:
 	python setup.py register -r pypi sdist bdist_wheel upload -r pypi
