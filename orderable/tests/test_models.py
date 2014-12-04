@@ -14,12 +14,12 @@ class TestOrderingOnSave(TestCase):
         task = Task.objects.create()
 
         with self.assertNumQueries(1 if DJANGO_16 else 2):
+            # https://docs.djangoproject.com/en/dev/releases/1.6/#model-save-algorithm-changed
             # Queries on django < 1.6
             #     SELECT
             #     UPDATE
             # Queries on django >= 1.6
             #     UPDATE
-            #  See http://goo.gl/KGz5vC
             task.save()
 
     def test_unspecified_order(self):
