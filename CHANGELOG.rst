@@ -1,5 +1,5 @@
-Upcoming
-========
+v3.0.0
+======
 
 * Drop support for django 1.5 and python 2.6.
 * Add (preliminary) support for django 1.7 and python 3.4.
