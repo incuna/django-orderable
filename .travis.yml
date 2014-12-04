@@ -6,6 +6,7 @@ python:
 env:
   - DJANGO=django>=1.4,<1.5
   - DJANGO=django>=1.6,<1.7
+  - DJANGO=django>=1.7,<1.8
 install:
   - psql -c 'CREATE DATABASE orderable' -U postgres;
   - pip install $DJANGO --use-mirrors
