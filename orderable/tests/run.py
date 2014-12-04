@@ -13,11 +13,20 @@ settings.configure(
     INSTALLED_APPS=(
         'orderable.tests',
     ),
+    MIDDLEWARE_CLASSES=[],
 )
+
+
+import django
+if django.VERSION >= (1, 7):
+    django.setup()
+
+
 try:
     from django.test.runner import DiscoverRunner
 except ImportError:
     from discover_runner.runner import DiscoverRunner
+
 
 test_runner = DiscoverRunner(verbosity=1)
 failures = test_runner.run_tests(['orderable'])
