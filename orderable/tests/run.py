@@ -1,6 +1,6 @@
-"""From http://stackoverflow.com/a/12260597/400691"""
 import sys
 
+import django
 from django.conf import settings
 
 
@@ -17,7 +17,6 @@ settings.configure(
 )
 
 
-import django
 if django.VERSION >= (1, 7):
     django.setup()
 

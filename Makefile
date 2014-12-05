@@ -9,6 +9,7 @@ help:
 test:
 	@coverage run orderable/tests/run.py
 	@coverage report -m
+	@flake8
 
 release:
 	python setup.py register -r pypi sdist bdist_wheel upload -r pypi
