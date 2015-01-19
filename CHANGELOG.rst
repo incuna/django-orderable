@@ -1,3 +1,8 @@
+v3.1.0
+======
+
+* Default to hosted jQuery and jQuery UI from google CDN. `\o/`
+
 v3.0.0
 ======
 
