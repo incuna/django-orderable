@@ -12,7 +12,7 @@ class OrderableAdmin(admin.ModelAdmin):
     """
     jQuery orderable objects in the admin.
 
-    You'll want your object to subclass incuna.db.models.Orderable and you
+    You'll want your object to subclass orderable.models.Orderable and you
     want to add sort_order_display to list_display.
     """
     list_display = ('__str__', 'sort_order_display')
@@ -67,6 +67,12 @@ class OrderableAdmin(admin.ModelAdmin):
                 neworder += 1
 
         return HttpResponse("OK")
+
+    class Media:
+        js = (
+            '//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js',
+            '//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js',
+        )
 
 
 class OrderableTabularInline(admin.TabularInline):

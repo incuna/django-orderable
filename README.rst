@@ -56,7 +56,7 @@ Subclass the appropriate Orderable admin classes: ::
         ...
 
 
-You need jQuery 1.2+ and jQuery UI 1.5+ available in the Admin for the actual moveable UI. You can either override the base admin template or add them in a Media class: ::
+jQuery and jQuery UI are used in the Admin for the actual moveable UI. You may override the versions with your own (rather than using the google cdn)::
 
     class SomeAdminClass(OrderableAdmin):
         class Media:
