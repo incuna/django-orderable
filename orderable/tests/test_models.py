@@ -1,11 +1,7 @@
-import django
 from django.test import TestCase
 
 from . import factories
 from .models import Task
-
-
-DJANGO_16 = '.'.join(map(str, django.VERSION)) >= '1.6'
 
 
 class TestOrderingOnSave(TestCase):
@@ -13,13 +9,11 @@ class TestOrderingOnSave(TestCase):
         """Normal saves should avoid giggery pokery."""
         task = Task.objects.create()
 
-        with self.assertNumQueries(3 if DJANGO_16 else 4):
-            # https://docs.djangoproject.com/en/dev/releases/1.6/#model-save-algorithm-changed
-            # Queries on django < 1.6
-            #     SELECT
+        with self.assertNumQueries(3):
+            # Queries:
+            #     SAVEPOINT
             #     UPDATE
-            # Queries on django >= 1.6
-            #     UPDATE
+            #     COMMIT
             task.save()
 
     def test_unspecified_order(self):
@@ -33,8 +27,10 @@ class TestOrderingOnSave(TestCase):
 
         with self.assertNumQueries(4):
             # Queries
+            #     Savepoint
             #     Find last position in list
             #     Save to last position in list
+            #     Commit
             new = factories.TaskFactory.create()
 
         tasks = Task.objects.all()
@@ -57,8 +53,10 @@ class TestOrderingOnSave(TestCase):
         # Insert between old_1 and old_2
         with self.assertNumQueries(4):
             # Queries:
+            #     Savepoint
             #     Bump old_2 to position 3
             #     Save new in position 2
+            #     Commit
             new = factories.TaskFactory.create(sort_order=old_2.sort_order)
 
         tasks = Task.objects.all()
@@ -83,14 +81,14 @@ class TestOrderingOnSave(TestCase):
         item5 = factories.TaskFactory.create(sort_order=5)
 
         # Move item2 to position 4
-        with self.assertNumQueries(6 if DJANGO_16 else 8):
+        with self.assertNumQueries(6):
             # Queries:
+            #     Savepoint
             #     Find end of list
-            #     SELECT item2 (on django < 1.6)
             #     Move item2 to end of list
             #     Shuffle item3 and item4 back by one
-            #     SELECT item2 (on django < 1.6)
             #     Save item2 to new desired position
+            #     Commit
             item2.sort_order = item4.sort_order
             item2.save()
 
@@ -117,14 +115,14 @@ class TestOrderingOnSave(TestCase):
         item5 = factories.TaskFactory.create(sort_order=5)
 
         # Move item4 to position 2
-        with self.assertNumQueries(6 if DJANGO_16 else 8):
+        with self.assertNumQueries(6):
             # Queries:
+            #     Savepoint
             #     Find end of list
-            #     SELECT item4 (on django < 1.6)
             #     Move item4 to end of list
             #     Bump item2 and item3 on by one
-            #     SELECT item4 (on django < 1.6)
             #     Save item4 to new desired position
+            #     Commit
             item4.sort_order = item2.sort_order
             item4.save()
 
