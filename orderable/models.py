@@ -68,6 +68,7 @@ class Orderable(models.Model):
         ).order_by('-sort_order').first()
 
     def _save(self, objects, old_pos, new_pos):
+        """WARNING: Intensive giggery-pokery zone."""
         to_shift = objects.exclude(pk=self.pk) if self.pk else objects
 
         # If not set, insert at end.
@@ -108,13 +109,7 @@ class Orderable(models.Model):
         self.sort_order = max_obj + 1 if max_obj else 1
 
     def save(self, *args, **kwargs):
-        """
-        Keep the unique order in sync.
-
-        Expects to be run in a transaction to avoid race conditions.
-
-        WARNING: Intensive giggery-pokery zone.
-        """
+        """Keep the unique order in sync."""
         objects = self.get_filtered_manager()
         old_pos = getattr(self, '_original_sort_order', None)
         new_pos = self.sort_order
