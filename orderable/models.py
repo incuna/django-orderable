@@ -1,5 +1,5 @@
 from django.core.exceptions import ObjectDoesNotExist
-from django.db import models, transaction, IntegrityError
+from django.db import IntegrityError, models, transaction
 
 
 class Orderable(models.Model):
@@ -124,7 +124,8 @@ class Orderable(models.Model):
                 self._save(objects, old_pos, new_pos)
         except IntegrityError:
             with transaction.atomic():
-                old_pos = objects.filter(pk=self.pk).values_list('sort_order', flat=True)[0]
+                old_pos = objects.filter(pk=self.pk).values_list(
+                    'sort_order', flat=True)[0]
                 self._save(objects, old_pos, new_pos)
 
         # Call the "real" save() method.
