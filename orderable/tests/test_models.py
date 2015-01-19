@@ -13,7 +13,7 @@ class TestOrderingOnSave(TestCase):
         """Normal saves should avoid giggery pokery."""
         task = Task.objects.create()
 
-        with self.assertNumQueries(1 if DJANGO_16 else 2):
+        with self.assertNumQueries(3 if DJANGO_16 else 4):
             # https://docs.djangoproject.com/en/dev/releases/1.6/#model-save-algorithm-changed
             # Queries on django < 1.6
             #     SELECT
@@ -31,7 +31,7 @@ class TestOrderingOnSave(TestCase):
         """
         old = factories.TaskFactory.create(sort_order=1)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4):
             # Queries
             #     Find last position in list
             #     Save to last position in list
@@ -55,7 +55,7 @@ class TestOrderingOnSave(TestCase):
         old_3 = factories.TaskFactory.create(sort_order=3)
 
         # Insert between old_1 and old_2
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4):
             # Queries:
             #     Bump old_2 to position 3
             #     Save new in position 2
@@ -83,7 +83,7 @@ class TestOrderingOnSave(TestCase):
         item5 = factories.TaskFactory.create(sort_order=5)
 
         # Move item2 to position 4
-        with self.assertNumQueries(4 if DJANGO_16 else 6):
+        with self.assertNumQueries(6 if DJANGO_16 else 8):
             # Queries:
             #     Find end of list
             #     SELECT item2 (on django < 1.6)
@@ -117,7 +117,7 @@ class TestOrderingOnSave(TestCase):
         item5 = factories.TaskFactory.create(sort_order=5)
 
         # Move item4 to position 2
-        with self.assertNumQueries(4 if DJANGO_16 else 6):
+        with self.assertNumQueries(6 if DJANGO_16 else 8):
             # Queries:
             #     Find end of list
             #     SELECT item4 (on django < 1.6)
