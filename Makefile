@@ -7,7 +7,8 @@ help:
 	@echo " make release -- pushes to pypi"
 
 test:
-	@python orderable/tests/run.py
+	@coverage run orderable/tests/run.py
+	@coverage report -m
 	@flake8
 
 release:
