@@ -139,3 +139,62 @@ class TestOrderingOnSave(TestCase):
         """Zero should be a valid value for sort_order."""
         zero_task = Task.objects.create(sort_order=0)
         self.assertEqual(zero_task.sort_order, 0)
+
+    def test_reordering(self):
+        """Check you can reassign a complete new order.
+
+        This is similar to a formset or the admin reorder view.
+        """
+        tasks = [
+            factories.TaskFactory.create(),
+            factories.TaskFactory.create(),
+            factories.TaskFactory.create(),
+            factories.TaskFactory.create(),
+        ]
+        tasks[0].sort_order = 3
+        tasks[0].save()
+        tasks[1].sort_order = 4
+        tasks[1].save()
+        tasks[2].sort_order = 1
+        tasks[2].save()
+        tasks[3].sort_order = 2
+        tasks[3].save()
+        self.assertSequenceEqual(Task.objects.all(), [
+            tasks[2],
+            tasks[3],
+            tasks[0],
+            tasks[1],
+        ])
+
+
+class TestSubTask(TestCase):
+
+    def test_duplicated_sort_order_on_different_parents(self):
+        task = factories.TaskFactory.create()
+        task_2 = factories.TaskFactory.create()
+        subtask = factories.SubTaskFactory.create(task=task)
+        subtask_2 = factories.SubTaskFactory.create(task=task_2)
+        self.assertEqual(subtask.sort_order, subtask_2.sort_order)
+
+    def test_reordering(self):
+        """Check you can reassign a complete new order.
+
+        This is similar to a formset or the admin reorder view. The subtask
+        version differs importantly because there is a database level
+        uniqueness constraint.
+        """
+        task = factories.TaskFactory.create()
+        subtasks = [
+            factories.SubTaskFactory.create(task=task),
+            factories.SubTaskFactory.create(task=task),
+            factories.SubTaskFactory.create(task=task),
+            factories.SubTaskFactory.create(task=task),
+        ]
+        subtasks[0].sort_order = 3
+        subtasks[0].save()
+        subtasks[1].sort_order = 4
+        subtasks[1].save()
+        subtasks[2].sort_order = 1
+        subtasks[2].save()
+        subtasks[3].sort_order = 2
+        subtasks[3].save()
