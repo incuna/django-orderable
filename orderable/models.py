@@ -24,11 +24,11 @@ class Orderable(models.Model):
     def get_unique_fields(self):
         """List field names that are unique_together with `sort_order`."""
         for unique_together in self._meta.unique_together:
-            # for together in togethers:
             if 'sort_order' in unique_together:
                 unique_fields = list(unique_together)
                 unique_fields.remove('sort_order')
                 return unique_fields
+        return []
 
     def get_filters(self):
         """
@@ -108,11 +108,21 @@ class Orderable(models.Model):
         max_obj = objects.all().aggregate(models.Max('sort_order'))['sort_order__max']
         self.sort_order = max_obj + 1 if max_obj else 1
 
+    def _unique_togethers_changed(self):
+        for field in self.get_unique_fields():
+            if getattr(self, '_original_%s' % field, False):
+                return True
+        return False
+
     def save(self, *args, **kwargs):
         """Keep the unique order in sync."""
         objects = self.get_filtered_manager()
         old_pos = getattr(self, '_original_sort_order', None)
         new_pos = self.sort_order
+
+        if old_pos is None and self._unique_togethers_changed():
+            self.sort_order = None
+            new_pos = None
 
         try:
             with transaction.atomic():
@@ -137,15 +147,17 @@ class Orderable(models.Model):
         """
         Cache original value of `sort_order` when a change is made to it.
 
+        Also cache values of other unique together fields.
+
         Greatly inspired by http://code.google.com/p/django-audit/
         """
-        if attr == 'sort_order':
+        if attr == 'sort_order' or attr in self.get_unique_fields():
             try:
                 current = getattr(self, attr)
             except (AttributeError, KeyError, ObjectDoesNotExist):
                 pass
             else:
-                previously_set = getattr(self, '_original_sort_order', False)
+                previously_set = getattr(self, '_original_%s' % attr, False)
                 if current != value and not previously_set:
-                    self._original_sort_order = current
+                    setattr(self, '_original_%s' % attr, current)
         super(Orderable, self).__setattr__(attr, value)

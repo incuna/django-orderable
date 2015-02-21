@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from . import factories
-from .models import Task
+from .models import Task, SubTask
 
 
 class TestOrderingOnSave(TestCase):
@@ -196,3 +196,15 @@ class TestSubTask(TestCase):
         subtasks[2].save()
         subtasks[3].sort_order = 2
         subtasks[3].save()
+
+    def test_changing_parent(self):
+        """Check changing the unique together parent."""
+        task = factories.TaskFactory.create()
+        task_2 = factories.TaskFactory.create()
+        subtask = factories.SubTaskFactory.create(task=task)
+        subtask_2 = factories.SubTaskFactory.create(task=task_2)
+        self.assertEqual(subtask.sort_order, subtask_2.sort_order)
+        subtask_2 = SubTask.objects.get(pk=subtask_2.pk)
+        subtask_2.task = task
+        subtask_2.save()
+        self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
