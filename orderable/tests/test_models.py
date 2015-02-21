@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from . import factories
-from .models import Task, SubTask
+from .models import SubTask, Task
 
 
 class TestOrderingOnSave(TestCase):
