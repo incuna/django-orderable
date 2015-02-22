@@ -27,7 +27,7 @@ class Orderable(models.Model):
             if 'sort_order' in unique_together:
                 unique_fields = list(unique_together)
                 unique_fields.remove('sort_order')
-                return unique_fields
+                return ['%s_id' % f for f in unique_fields]
         return []
 
     def get_filters(self):
