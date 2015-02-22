@@ -40,11 +40,7 @@ class OrderableAdmin(admin.ModelAdmin):
 
     def get_url_name(self):
         meta = self.model._meta
-        try:
-            model_name = meta.model_name
-        except AttributeError:
-            # model_name is called module_name in django < 1.6
-            model_name = meta.module_name
+        model_name = meta.model_name
 
         return '{0}admin_{1}_{2}_reorder'.format(
             self.admin_site.name, meta.app_label, model_name,
