@@ -6,11 +6,12 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     version='3.1.0',
-    description='Orderable model and admin',
+    description='Add manual sort order to Django objects via an abstract base '
+                'class and admin classes.',
     author='Incuna Ltd',
-    author_email='dev@incuna.com',
+    author_email='admin@incuna.com',
     url='https://github.com/incuna/django-orderable',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     license='BSD',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
