@@ -1,7 +1,6 @@
 import django
 from django.test import TestCase
 
-from . import factories
 from .models import Task
 
 
@@ -29,13 +28,13 @@ class TestOrderingOnSave(TestCase):
         Before: old
         After:  old  new
         """
-        old = factories.TaskFactory.create(sort_order=1)
+        old = Task.objects.create(sort_order=1)
 
         with self.assertNumQueries(2):
             # Queries
             #     Find last position in list
             #     Save to last position in list
-            new = factories.TaskFactory.create()
+            new = Task.objects.create()
 
         tasks = Task.objects.all()
         # Make sure list is in correct order
@@ -50,16 +49,16 @@ class TestOrderingOnSave(TestCase):
         Before: old_1  old_2  old_3
         After:  old_1   new   old_2  old_3
         """
-        old_1 = factories.TaskFactory.create(sort_order=1)
-        old_2 = factories.TaskFactory.create(sort_order=2)
-        old_3 = factories.TaskFactory.create(sort_order=3)
+        old_1 = Task.objects.create(sort_order=1)
+        old_2 = Task.objects.create(sort_order=2)
+        old_3 = Task.objects.create(sort_order=3)
 
         # Insert between old_1 and old_2
         with self.assertNumQueries(2):
             # Queries:
             #     Bump old_2 to position 3
             #     Save new in position 2
-            new = factories.TaskFactory.create(sort_order=old_2.sort_order)
+            new = Task.objects.create(sort_order=old_2.sort_order)
 
         tasks = Task.objects.all()
         # Make sure list is in correct order
@@ -76,11 +75,11 @@ class TestOrderingOnSave(TestCase):
         Before: item1  item2  item3  item4  item5
         After:  item1  item3  item4  item2  item5
         """
-        item1 = factories.TaskFactory.create(sort_order=1)
-        item2 = factories.TaskFactory.create(sort_order=2)
-        item3 = factories.TaskFactory.create(sort_order=3)
-        item4 = factories.TaskFactory.create(sort_order=4)
-        item5 = factories.TaskFactory.create(sort_order=5)
+        item1 = Task.objects.create(sort_order=1)
+        item2 = Task.objects.create(sort_order=2)
+        item3 = Task.objects.create(sort_order=3)
+        item4 = Task.objects.create(sort_order=4)
+        item5 = Task.objects.create(sort_order=5)
 
         # Move item2 to position 4
         with self.assertNumQueries(4 if DJANGO_16 else 6):
@@ -110,11 +109,11 @@ class TestOrderingOnSave(TestCase):
         Before: item1  item2  item3  item4  item5
         After:  item1  item4  item2  item3  item5
         """
-        item1 = factories.TaskFactory.create(sort_order=1)
-        item2 = factories.TaskFactory.create(sort_order=2)
-        item3 = factories.TaskFactory.create(sort_order=3)
-        item4 = factories.TaskFactory.create(sort_order=4)
-        item5 = factories.TaskFactory.create(sort_order=5)
+        item1 = Task.objects.create(sort_order=1)
+        item2 = Task.objects.create(sort_order=2)
+        item3 = Task.objects.create(sort_order=3)
+        item4 = Task.objects.create(sort_order=4)
+        item5 = Task.objects.create(sort_order=5)
 
         # Move item4 to position 2
         with self.assertNumQueries(4 if DJANGO_16 else 6):
