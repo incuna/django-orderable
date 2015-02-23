@@ -67,17 +67,19 @@ If your subclass of Orderable has a Metaclass then make sure it subclasses the O
 
 ### Transactions
 
-Saving orderable models invokes a fair number of queries and
-in order to avoid race conditions should be run in a transaction. If you're
-using Django >= 1.6 we recommend you set `DATABASES['default']['ATOMIC_REQUESTS'] = True` in your
+Saving orderable models invokes a fair number of queries and in order to avoid
+race conditions should be run in a transaction. If you're using Django >= 1.6
+we recommend you set `[DATABASES['default']['ATOMIC_REQUESTS'] = True](https://docs.djangoproject.com/en/1.7/topics/db/transactions/#tying-transactions-to-http-requests)` in your
 settings, if you're not yet on Django 1.6, we recommend use of
-`TransactionMiddleware`.
+`[TransactionMiddleware](https://docs.djangoproject.com/en/1.7/topics/db/transactions/#transaction-middleware)`.
+
 
 ### Adding Orderable to Existing Models
 
-You will need to populate the required `sort_order` field. Typically this is done by adding the
-field in one migration with a default of `0`, then creating a data migration to set the value to
-that of its primary key::
+You will need to populate the required `sort_order` field. Typically this is
+done by adding the field in one migration with a default of `0`, then creating
+a data migration to set the value to that of its primary key::
+
 
     for obj in orm['appname.Model'].objects.all():
         obj.sort_order = obj.pk
@@ -86,7 +88,9 @@ that of its primary key::
 
 ### Multiple Models using Orderable
 
-When multiple models inherit from Orderable the `next()` and `previous()` methods will look for the
-next/previous model with a sort order. However you'll likely want to have the various sort orders
-determined by a foreign key or some other predicate. The easiest way (currently) is to override the
-method in question.
+When multiple models inherit from Orderable the `next()` and `previous()`
+methods will look for the next/previous model with a sort order. However you'll
+likely want to have the various sort orders determined by a foreign key or some
+other predicate. The easiest way (currently) is to override the method in
+question.
+
