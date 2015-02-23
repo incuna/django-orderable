@@ -6,7 +6,8 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     version='3.1.0',
-    description='Add manual sort order to Django objects via an abstract base class and admin classes.',
+    description='Add manual sort order to Django objects via an abstract base '
+                'class and admin classes.',
     author='Incuna Ltd',
     author_email='admin@incuna.com',
     url='https://github.com/incuna/django-orderable',
