@@ -1,9 +1,7 @@
-django-orderable
-================
+# Django Orderable
 
-Make models orderable in the Admin.
 
-Included:
+Add manual sort order to Django objects via an abstract base class and admin classes. Project includes:
 
 * Abstract base Model
 * Admin class
@@ -11,8 +9,13 @@ Included:
 * Admin templates
 
 
-Installation
-------------
+## Demo
+
+
+![django-orderable demo](https://cloud.githubusercontent.com/assets/30606/6326221/667992e0-bb47-11e4-923e-29334573ff5c.gif)
+
+## Installation
+
 
 Grab from the PyPI: ::
 
@@ -33,16 +36,6 @@ Subclass the Orderable class: ::
     class Book(Orderable):
         ...
 
-
-**Note:** If your subclass of Orderable has a Metaclass then make sure it subclasses the Orderable one so the model is sorted by ``sort_order``.
-
-** *Also* Note:** Saving orderable models invokes a fair number of queries and
-in order to avoid race conditions should be run in a transaction. If you're
-using django >= 1.6 we recommend you set `DATABASES['default']['ATOMIC_REQUESTS'] = True` in your
-settings, if you're not yet on django 1.6, we recommend use of
-`TransactionMiddleware`.
-
-
 Subclass the appropriate Orderable admin classes: ::
 
     from orderable.admin import OrderableAdmin, OrderableTabularInline
@@ -56,7 +49,7 @@ Subclass the appropriate Orderable admin classes: ::
         ...
 
 
-jQuery and jQuery UI are used in the Admin for the actual moveable UI. You may override the versions with your own (rather than using the google cdn)::
+jQuery and jQuery UI are used in the Admin for the draggable UI. You may override the versions with your own (rather than using Google's CDN)::
 
     class SomeAdminClass(OrderableAdmin):
         class Media:
@@ -66,11 +59,21 @@ jQuery and jQuery UI are used in the Admin for the actual moveable UI. You may o
             )
 
 
-Common Gotchas
---------------
+## Notes
 
-Adding Orderable to Existing Models
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Metaclasses
+
+If your subclass of Orderable has a Metaclass then make sure it subclasses the Orderable one so the model is sorted by ``sort_order``.
+
+### Transactions
+
+Saving orderable models invokes a fair number of queries and
+in order to avoid race conditions should be run in a transaction. If you're
+using Django >= 1.6 we recommend you set `DATABASES['default']['ATOMIC_REQUESTS'] = True` in your
+settings, if you're not yet on Django 1.6, we recommend use of
+`TransactionMiddleware`.
+
+### Adding Orderable to Existing Models
 
 You will need to populate the required `sort_order` field. Typically this is done by adding the
 field in one migration with a default of `0`, then creating a data migration to set the value to
@@ -81,8 +84,7 @@ that of its primary key::
         obj.save()
 
 
-Multiple Models using Orderable
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+### Multiple Models using Orderable
 
 When multiple models inherit from Orderable the `next()` and `previous()` methods will look for the
 next/previous model with a sort order. However you'll likely want to have the various sort orders
