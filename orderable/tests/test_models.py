@@ -1,10 +1,6 @@
-import django
 from django.test import TestCase
 
-from .models import Task
-
-
-DJANGO_16 = '.'.join(map(str, django.VERSION)) >= '1.6'
+from .models import SubTask, Task
 
 
 class TestOrderingOnSave(TestCase):
@@ -12,13 +8,11 @@ class TestOrderingOnSave(TestCase):
         """Normal saves should avoid giggery pokery."""
         task = Task.objects.create()
 
-        with self.assertNumQueries(1 if DJANGO_16 else 2):
-            # https://docs.djangoproject.com/en/dev/releases/1.6/#model-save-algorithm-changed
-            # Queries on django < 1.6
-            #     SELECT
+        with self.assertNumQueries(3):
+            # Queries:
+            #     SAVEPOINT
             #     UPDATE
-            # Queries on django >= 1.6
-            #     UPDATE
+            #     COMMIT
             task.save()
 
     def test_unspecified_order(self):
@@ -30,10 +24,12 @@ class TestOrderingOnSave(TestCase):
         """
         old = Task.objects.create(sort_order=1)
 
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4):
             # Queries
+            #     Savepoint
             #     Find last position in list
             #     Save to last position in list
+            #     Commit
             new = Task.objects.create()
 
         tasks = Task.objects.all()
@@ -54,10 +50,12 @@ class TestOrderingOnSave(TestCase):
         old_3 = Task.objects.create(sort_order=3)
 
         # Insert between old_1 and old_2
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(4):
             # Queries:
+            #     Savepoint
             #     Bump old_2 to position 3
             #     Save new in position 2
+            #     Commit
             new = Task.objects.create(sort_order=old_2.sort_order)
 
         tasks = Task.objects.all()
@@ -82,14 +80,14 @@ class TestOrderingOnSave(TestCase):
         item5 = Task.objects.create(sort_order=5)
 
         # Move item2 to position 4
-        with self.assertNumQueries(4 if DJANGO_16 else 6):
+        with self.assertNumQueries(6):
             # Queries:
+            #     Savepoint
             #     Find end of list
-            #     SELECT item2 (on django < 1.6)
             #     Move item2 to end of list
             #     Shuffle item3 and item4 back by one
-            #     SELECT item2 (on django < 1.6)
             #     Save item2 to new desired position
+            #     Commit
             item2.sort_order = item4.sort_order
             item2.save()
 
@@ -116,14 +114,14 @@ class TestOrderingOnSave(TestCase):
         item5 = Task.objects.create(sort_order=5)
 
         # Move item4 to position 2
-        with self.assertNumQueries(4 if DJANGO_16 else 6):
+        with self.assertNumQueries(6):
             # Queries:
+            #     Savepoint
             #     Find end of list
-            #     SELECT item4 (on django < 1.6)
             #     Move item4 to end of list
             #     Bump item2 and item3 on by one
-            #     SELECT item4 (on django < 1.6)
             #     Save item4 to new desired position
+            #     Commit
             item4.sort_order = item2.sort_order
             item4.save()
 
@@ -138,3 +136,74 @@ class TestOrderingOnSave(TestCase):
         """Zero should be a valid value for sort_order."""
         zero_task = Task.objects.create(sort_order=0)
         self.assertEqual(zero_task.sort_order, 0)
+
+    def test_reordering(self):
+        """Check you can reassign a complete new order.
+
+        This is similar to a formset or the admin reorder view.
+        """
+        tasks = [
+            Task.objects.create(),
+            Task.objects.create(),
+            Task.objects.create(),
+            Task.objects.create(),
+        ]
+        tasks[0].sort_order = 3
+        tasks[0].save()
+        tasks[1].sort_order = 4
+        tasks[1].save()
+        tasks[2].sort_order = 1
+        tasks[2].save()
+        tasks[3].sort_order = 2
+        tasks[3].save()
+        self.assertSequenceEqual(Task.objects.all(), [
+            tasks[2],
+            tasks[3],
+            tasks[0],
+            tasks[1],
+        ])
+
+
+class TestSubTask(TestCase):
+
+    def test_duplicated_sort_order_on_different_parents(self):
+        task = Task.objects.create()
+        task_2 = Task.objects.create()
+        subtask = SubTask.objects.create(task=task)
+        subtask_2 = SubTask.objects.create(task=task_2)
+        self.assertEqual(subtask.sort_order, subtask_2.sort_order)
+
+    def test_reordering(self):
+        """Check you can reassign a complete new order.
+
+        This is similar to a formset or the admin reorder view. The subtask
+        version differs importantly because there is a database level
+        uniqueness constraint.
+        """
+        task = Task.objects.create()
+        subtasks = [
+            SubTask.objects.create(task=task),
+            SubTask.objects.create(task=task),
+            SubTask.objects.create(task=task),
+            SubTask.objects.create(task=task),
+        ]
+        subtasks[0].sort_order = 3
+        subtasks[0].save()
+        subtasks[1].sort_order = 4
+        subtasks[1].save()
+        subtasks[2].sort_order = 1
+        subtasks[2].save()
+        subtasks[3].sort_order = 2
+        subtasks[3].save()
+
+    def test_changing_parent(self):
+        """Check changing the unique together parent."""
+        task = Task.objects.create()
+        task_2 = Task.objects.create()
+        subtask = SubTask.objects.create(task=task)
+        subtask_2 = SubTask.objects.create(task=task_2)
+        self.assertEqual(subtask.sort_order, subtask_2.sort_order)
+        subtask_2 = SubTask.objects.get(pk=subtask_2.pk)
+        subtask_2.task = task
+        subtask_2.save()
+        self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])

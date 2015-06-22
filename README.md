@@ -67,15 +67,8 @@ If your subclass of Orderable has a Metaclass then make sure it subclasses the O
 
 ### Transactions
 
-Saving orderable models invokes a fair number of queries and in order to avoid
-race conditions should be run in a transaction.
-
-If you're using Django >= 1.6, you should set `DATABASES['default']['ATOMIC_REQUESTS'] = True` ([Django docs](https://docs.djangoproject.com/en/1.7/topics/db/transactions/#tying-transactions-to-http-requests)) in your
-settings.
-
-If you're using Django < 1.6, we recommend the use of
-`TransactionMiddleware` ([Django docs](https://docs.djangoproject.com/en/1.7/topics/db/transactions/#transaction-middleware)).
-
+Saving orderable models invokes a fair number of database queries, and in order
+to avoid race conditions should be run in a transaction.
 
 ### Adding Orderable to Existing Models
 
