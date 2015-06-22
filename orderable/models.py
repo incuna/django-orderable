@@ -29,6 +29,7 @@ class Orderable(models.Model):
                 unique_fields = list(unique_together)
                 unique_fields.remove('sort_order')
                 return unique_fields
+        return []
 
     def get_filters(self):
         """
@@ -77,7 +78,13 @@ class Orderable(models.Model):
         """
         objects = self.get_filtered_manager()
         to_shift = objects.exclude(pk=self.pk) if self.pk else objects
-        old_pos = getattr(self, '_original_sort_order', None)
+        try:
+            old_pos = self._original_unique_fields['sort_order']
+        except KeyError:
+            old_pos = None
+        else:
+            # Later check looks for any other unique fields with sort_order
+            del(self._original_unique_fields['sort_order'])
         new_pos = self.sort_order
 
         def _move_to_end(commit=True):
@@ -121,6 +128,10 @@ class Orderable(models.Model):
             to_shift.update(sort_order=models.F('sort_order') - 1)
             _move_to_new_pos()
 
+        # A field which is unique with the sort-order field has changed
+        elif len(self._original_unique_fields):
+            _move_to_end(commit=False)
+
         # Call the "real" save() method.
         super(Orderable, self).save(*args, **kwargs)
 
@@ -137,13 +148,18 @@ class Orderable(models.Model):
 
         Greatly inspired by http://code.google.com/p/django-audit/
         """
-        if attr == 'sort_order':
+
+        if attr == 'sort_order' or attr in self.get_unique_fields():
+
+            if not hasattr(self, '_original_unique_fields'):
+                self._original_unique_fields = {}
+
             try:
                 current = getattr(self, attr)
             except (AttributeError, KeyError, ObjectDoesNotExist):
                 pass
             else:
-                previously_set = getattr(self, '_original_sort_order', False)
+                previously_set =  attr in self._original_unique_fields
                 if current != value and not previously_set:
-                    self._original_sort_order = current
+                    self._original_unique_fields[attr] = current
         super(Orderable, self).__setattr__(attr, value)
