@@ -1,7 +1,7 @@
 v4.0.0
 ======
 
-* Dropped support for Django versions less than 1.5.
+* Drop support for Django versions less than 1.6.
 * Prevent integrity errors with unique_together conditions containing sort_order.
 
 v3.1.0
