@@ -1,3 +1,8 @@
+v4.0.1
+======
+
+* Fix jQuery (and UI) missing from OrderableTabularInline.
+
 v4.0.0
 ======
 
