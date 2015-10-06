@@ -78,3 +78,9 @@ class OrderableTabularInline(admin.TabularInline):
     You'll want your object to subclass incuna.db.models.Orderable.
     """
     template = "admin/edit_inline/orderable_tabular.html"
+
+    class Media:
+        js = (
+            '//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js',
+            '//ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js',
+        )
