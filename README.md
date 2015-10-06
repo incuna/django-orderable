@@ -53,6 +53,7 @@ jQuery and jQuery UI are used in the Admin for the draggable UI. You may overrid
 
     class SomeAdminClass(OrderableAdmin):
         class Media:
+            extend = False
             js = (
                 'path/to/jquery.js',
                 'path/to/jquery.ui.js',
