@@ -1,4 +1,6 @@
-from django.test import TestCase
+from hypothesis import given
+from hypothesis.extra.django import TestCase
+from hypothesis.strategies import integers, lists
 
 from .models import SubTask, Task
 
@@ -208,12 +210,13 @@ class TestSubTask(TestCase):
         subtask_2.save()
         self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
 
-    def test_save_subtask(self):
+    @given(lists(integers(min_value=1), min_size=1, unique=True))
+    def test_save_subtask(self, sort_orders):
         task = Task.objects.create()
 
         subtasks = [
             SubTask.objects.create(task=task, sort_order=order)
-            for order in [1, 7, 14, 20, 22, 23, 24]
+            for order in sort_orders
         ]
 
         subtask = subtasks[-1]
