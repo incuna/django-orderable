@@ -207,3 +207,15 @@ class TestSubTask(TestCase):
         subtask_2.task = task
         subtask_2.save()
         self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
+
+    def test_save_subtask(self):
+        task = Task.objects.create()
+
+        subtasks = [
+            SubTask.objects.create(task=task, sort_order=order)
+            for order in [1, 7, 14, 20, 22, 23, 24]
+        ]
+
+        subtask = subtasks[-1]
+        subtask.sort_order = 2
+        subtask.save()
