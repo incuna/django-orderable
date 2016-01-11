@@ -214,11 +214,5 @@ class TestSubTask(TestCase):
     def test_save_subtask(self, sort_orders):
         task = Task.objects.create()
 
-        subtasks = [
+        for order in sort_orders:
             SubTask.objects.create(task=task, sort_order=order)
-            for order in sort_orders
-        ]
-
-        subtask = subtasks[-1]
-        subtask.sort_order = 2
-        subtask.save()
