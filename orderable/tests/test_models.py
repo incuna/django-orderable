@@ -1,4 +1,4 @@
-from hypothesis import given
+from hypothesis import example, given
 from hypothesis.extra.django import TestCase
 from hypothesis.strategies import integers, lists
 
@@ -215,6 +215,8 @@ class TestSubTask(TestCase):
         self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
 
     @given(lists(integers(min_value=1), min_size=1, unique=True))
+    @example([2, 3, 1])
+    @example([2, 3, 4])
     def test_save_subtask_no_errors(self, sort_orders):
         """Ensure Orderable.save does not raise IntegrityError."""
         task = Task.objects.create()
