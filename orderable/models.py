@@ -67,6 +67,20 @@ class Orderable(models.Model):
             sort_order__lt=self.sort_order
         ).order_by('-sort_order').first()
 
+    @staticmethod
+    def _update(qs):
+        """
+        Increment the sort_order in a queryset.
+
+        Handle IntegrityErrors caused by unique constraints.
+        """
+        try:
+            with transaction.atomic():
+                qs.update(sort_order=models.F('sort_order') + 1)
+        except IntegrityError:
+            for obj in qs.order_by('-sort_order'):
+                qs.filter(pk=obj.pk).update(sort_order=models.F('sort_order') + 1)
+
     def _save(self, objects, old_pos, new_pos):
         """WARNING: Intensive giggery-pokery zone."""
         to_shift = objects.exclude(pk=self.pk) if self.pk else objects
@@ -80,14 +94,7 @@ class Orderable(models.Model):
             # Increment `sort_order` on objects with:
             #     sort_order > new_pos.
             to_shift = to_shift.filter(sort_order__gte=self.sort_order)
-            try:
-                with transaction.atomic():
-                    to_shift.update(sort_order=models.F('sort_order') + 1)
-            except IntegrityError:
-                for obj in to_shift.order_by('-sort_order'):
-                    to_shift.filter(pk=obj.pk).update(
-                        sort_order=models.F('sort_order') + 1,
-                    )
+            self._update(to_shift)
             self.sort_order = new_pos
 
         # self.sort_order decreased.
@@ -97,14 +104,7 @@ class Orderable(models.Model):
             # Increment `sort_order` on objects with:
             #     sort_order >= new_pos and sort_order < old_pos
             to_shift = to_shift.filter(sort_order__gte=new_pos, sort_order__lt=old_pos)
-            try:
-                with transaction.atomic():
-                    to_shift.update(sort_order=models.F('sort_order') + 1)
-            except IntegrityError:
-                for obj in to_shift.order_by('-sort_order'):
-                    to_shift.filter(pk=obj.pk).update(
-                        sort_order=models.F('sort_order') + 1,
-                    )
+            self._update(to_shift)
             self.sort_order = new_pos
 
         # self.sort_order increased.
