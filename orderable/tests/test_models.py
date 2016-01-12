@@ -1,4 +1,6 @@
-from django.test import TestCase
+from hypothesis import example, given
+from hypothesis.extra.django import TestCase
+from hypothesis.strategies import integers, lists
 
 from .models import SubTask, Task
 
@@ -50,12 +52,14 @@ class TestOrderingOnSave(TestCase):
         old_3 = Task.objects.create(sort_order=3)
 
         # Insert between old_1 and old_2
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             # Queries:
             #     Savepoint
+            #     Savepoint
             #     Bump old_2 to position 3
+            #     Release savepoint
+            #     Release savepoint
             #     Save new in position 2
-            #     Commit
             new = Task.objects.create(sort_order=old_2.sort_order)
 
         tasks = Task.objects.all()
@@ -114,14 +118,16 @@ class TestOrderingOnSave(TestCase):
         item5 = Task.objects.create(sort_order=5)
 
         # Move item4 to position 2
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(8):
             # Queries:
             #     Savepoint
             #     Find end of list
             #     Move item4 to end of list
+            #     Savepoint
             #     Bump item2 and item3 on by one
+            #     Release savepoint
+            #     Release savepoint
             #     Save item4 to new desired position
-            #     Commit
             item4.sort_order = item2.sort_order
             item4.save()
 
@@ -207,3 +213,16 @@ class TestSubTask(TestCase):
         subtask_2.task = task
         subtask_2.save()
         self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
+
+    @given(lists(integers(min_value=1), min_size=1, unique=True))
+    @example([2, 3, 1])
+    @example([2, 3, 4])
+    def test_save_subtask_no_errors(self, sort_orders):
+        """Ensure Orderable.save does not raise IntegrityError."""
+        task = Task.objects.create()
+
+        for order in sort_orders:
+            subtask = SubTask.objects.create(task=task, sort_order=order)
+
+        subtask.sort_order = 2
+        subtask.save()
