@@ -1,3 +1,8 @@
+v4.0.2
+======
+
+* Fix `IntegrityError` in `Orderable.save` when `sort_order` has a `unique` constraint.
+
 v4.0.1
 ======
 
