@@ -215,7 +215,8 @@ class TestSubTask(TestCase):
         self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
 
     @given(lists(integers(min_value=1), min_size=1, unique=True))
-    def test_save_subtask(self, sort_orders):
+    def test_save_subtask_no_errors(self, sort_orders):
+        """Ensure Orderable.save does not raise IntegrityError."""
         task = Task.objects.create()
 
         for order in sort_orders:
