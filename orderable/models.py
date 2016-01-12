@@ -97,7 +97,14 @@ class Orderable(models.Model):
             # Increment `sort_order` on objects with:
             #     sort_order >= new_pos and sort_order < old_pos
             to_shift = to_shift.filter(sort_order__gte=new_pos, sort_order__lt=old_pos)
-            to_shift.update(sort_order=models.F('sort_order') + 1)
+            try:
+                with transaction.atomic():
+                    to_shift.update(sort_order=models.F('sort_order') + 1)
+            except IntegrityError:
+                for obj in to_shift.order_by('-sort_order'):
+                    to_shift.filter(pk=obj.pk).update(
+                        sort_order=models.F('sort_order') + 1,
+                    )
             self.sort_order = new_pos
 
         # self.sort_order increased.

@@ -118,14 +118,16 @@ class TestOrderingOnSave(TestCase):
         item5 = Task.objects.create(sort_order=5)
 
         # Move item4 to position 2
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(8):
             # Queries:
             #     Savepoint
             #     Find end of list
             #     Move item4 to end of list
+            #     Savepoint
             #     Bump item2 and item3 on by one
+            #     Release savepoint
+            #     Release savepoint
             #     Save item4 to new desired position
-            #     Commit
             item4.sort_order = item2.sort_order
             item4.save()
 
@@ -217,4 +219,7 @@ class TestSubTask(TestCase):
         task = Task.objects.create()
 
         for order in sort_orders:
-            SubTask.objects.create(task=task, sort_order=order)
+            subtask = SubTask.objects.create(task=task, sort_order=order)
+
+        subtask.sort_order = 2
+        subtask.save()
