@@ -52,12 +52,14 @@ class TestOrderingOnSave(TestCase):
         old_3 = Task.objects.create(sort_order=3)
 
         # Insert between old_1 and old_2
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(6):
             # Queries:
             #     Savepoint
+            #     Savepoint
             #     Bump old_2 to position 3
+            #     Release savepoint
+            #     Release savepoint
             #     Save new in position 2
-            #     Commit
             new = Task.objects.create(sort_order=old_2.sort_order)
 
         tasks = Task.objects.all()
