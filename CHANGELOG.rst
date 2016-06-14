@@ -1,3 +1,8 @@
+Upcoming
+======
+
+* Use `{% static %}` instead of `{{ STATIC_URL }}` to display the drag handle image.
+
 v4.0.2
 ======
 

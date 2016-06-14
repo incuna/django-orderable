@@ -1,5 +1,7 @@
 {% extends "admin/change_list.html" %}
 
+{% load staticfiles %}
+
 {% block extrastyle %}
 {{ block.super }}
 <style type="text/css" media="screen">
@@ -31,7 +33,7 @@
 
             $(".sorthandle").parent().addClass("sorthandletd").css("cursor", "pointer");
 
-            $(".sorthandle").html("<img src='{{ STATIC_URL }}admin/img/drag_handle.gif' width='11' height='11' alt='Drag to reorder' />");
+            $(".sorthandle").html("<img src='{% static 'admin/img/drag_handle.gif' %}'' width='11' height='11' alt='Drag to reorder' />");
 
             // Force a width onto all the tds (so they drag nicely)
             $("#changelist table tbody tr > *").each(function() {
