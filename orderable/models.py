@@ -167,7 +167,7 @@ class Orderable(models.Model):
         """
         if attr == 'sort_order' or attr in self.get_unique_fields():
             try:
-                current = getattr(self, attr)
+                current = self.__dict__[attr]
             except (AttributeError, KeyError, ObjectDoesNotExist):
                 pass
             else:
