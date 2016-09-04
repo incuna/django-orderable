@@ -1,3 +1,8 @@
+UPCOMING
+======
+
+* (Also) use `{% static %}` instead of `{{ STATIC_URL }}` to display the drag handle image in the orderable_tabular.html.
+
 v4.0.3
 ======
 
