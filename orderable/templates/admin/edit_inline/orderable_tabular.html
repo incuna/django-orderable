@@ -1,3 +1,5 @@
+{% load staticfiles %}
+
 {% include "admin/edit_inline/tabular.html" %}
 
 
@@ -35,7 +37,7 @@ $(document).ready(function() {
 
     $(".sorthandle").parent().addClass("sorthandletd").css("cursor", "pointer");
 
-    $(".sorthandle").html("<img src='{{ STATIC_URL }}admin/img/drag_handle.gif' width='11' height='11' alt='Drag to reorder' />");
+    $(".sorthandle").html("<img src='{% static 'admin/img/drag_handle.gif' %}' width='11' height='11' alt='Drag to reorder' />");
 
     // Force a width onto all the tds (so they drag nicely)
     $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original > *").each(function() {
