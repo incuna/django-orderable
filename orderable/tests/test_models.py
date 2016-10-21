@@ -2,7 +2,7 @@ from hypothesis import example, given
 from hypothesis.extra.django import TestCase
 from hypothesis.strategies import integers, lists
 
-from .models import SubTask, Task
+from .models import SubTask, Task, Todo, TodoList
 
 
 class TestOrderingOnSave(TestCase):
@@ -226,3 +226,17 @@ class TestSubTask(TestCase):
 
         subtask.sort_order = 2
         subtask.save()
+
+
+class TestTodoList(TestCase):
+    """
+    There was a bug where related models were loosing their ordering
+    when they included a unique together
+    """
+    def test_list_retains_ordering(self):
+        todo_list = TodoList.objects.create()
+        todo_1 = Todo.objects.create(name='abc', list=todo_list, sort_order=2)
+        todo_2 = Todo.objects.create(name='def', list=todo_list, sort_order=1)
+
+        self.assertEqual(todo_list.todos.first(), todo_2)
+        self.assertEqual(todo_list.todos.last(), todo_1)
