@@ -2,7 +2,7 @@ from hypothesis import example, given
 from hypothesis.extra.django import TestCase
 from hypothesis.strategies import integers, lists
 
-from .models import SubTask, Task, Todo, TodoList
+from .models import SubTask, Task
 
 
 class TestOrderingOnSave(TestCase):
@@ -188,19 +188,17 @@ class TestSubTask(TestCase):
         """
         task = Task.objects.create()
         subtasks = [
-            SubTask.objects.create(task=task),
-            SubTask.objects.create(task=task),
-            SubTask.objects.create(task=task),
-            SubTask.objects.create(task=task),
+            SubTask.objects.create(task=task, sort_order=3),
+            SubTask.objects.create(task=task, sort_order=4),
+            SubTask.objects.create(task=task, sort_order=1),
+            SubTask.objects.create(task=task, sort_order=2),
         ]
-        subtasks[0].sort_order = 3
-        subtasks[0].save()
-        subtasks[1].sort_order = 4
-        subtasks[1].save()
-        subtasks[2].sort_order = 1
-        subtasks[2].save()
-        subtasks[3].sort_order = 2
-        subtasks[3].save()
+        self.assertSequenceEqual(task.subtask_set.all(), [
+            subtasks[2],
+            subtasks[3],
+            subtasks[0],
+            subtasks[1],
+        ])
 
     def test_changing_parent(self):
         """Check changing the unique together parent."""
@@ -226,17 +224,3 @@ class TestSubTask(TestCase):
 
         subtask.sort_order = 2
         subtask.save()
-
-
-class TestTodoList(TestCase):
-    """
-    There was a bug where related models were loosing their ordering
-    when they included a unique together
-    """
-    def test_list_retains_ordering(self):
-        todo_list = TodoList.objects.create()
-        todo_1 = Todo.objects.create(name='abc', list=todo_list, sort_order=2)
-        todo_2 = Todo.objects.create(name='def', list=todo_list, sort_order=1)
-
-        self.assertEqual(todo_list.todos.first(), todo_2)
-        self.assertEqual(todo_list.todos.last(), todo_1)
