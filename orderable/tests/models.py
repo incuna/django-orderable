@@ -14,7 +14,7 @@ class SubTask(Orderable):
     """An orderable model with unique_together."""
     task = models.ForeignKey('Task')
 
-    class Meta:
+    class Meta(Orderable.Meta):
         unique_together = ('task', 'sort_order')
 
     def __str__(self):
