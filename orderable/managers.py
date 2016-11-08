@@ -1,6 +1,7 @@
-from django.db.models import manager
+from django.db.models import Manager
 
 from .querysets import OrderableQueryset
 
 
-OrderableManager = manager.BaseManager.from_queryset(OrderableQueryset)
+class OrderableManager(Manager.from_queryset(OrderableQueryset)):
+    pass
