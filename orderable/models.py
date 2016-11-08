@@ -59,17 +59,13 @@ class Orderable(models.Model):
         if not self.sort_order:
             return None
 
-        return self.get_filtered_manager().filter(
-            sort_order__gt=self.sort_order
-        ).order_by('sort_order').first()
+        return self.get_filtered_manager().after(self)
 
     def prev(self):
         if not self.sort_order:
             return None
 
-        return self.get_filtered_manager().filter(
-            sort_order__lt=self.sort_order
-        ).order_by('-sort_order').first()
+        return self.get_filtered_manager().before(self)
 
     @staticmethod
     def _update(qs):
