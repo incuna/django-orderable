@@ -6,30 +6,27 @@ from .models import SubTask, Task
 class TestOrderableManager(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.tasks = []
+        tasks = []
         for i in range(3):
             task = Task(sort_order=i)
             task.save()
-            cls.tasks.append(task)
+            tasks.append(task)
+        cls.first_task, cls.middle_task, cls.last_task = tasks
 
     def test_gets_next(self):
-        first_task = self.tasks[0]
-        next_task = Task.objects.after(first_task)
-        self.assertEqual(next_task, self.tasks[1])
+        next_task = Task.objects.after(self.first_task)
+        self.assertEqual(next_task, self.middle_task)
 
     def test_gets_previous(self):
-        last_task = self.tasks[2]
-        previous_task = Task.objects.before(last_task)
-        self.assertEqual(previous_task, self.tasks[1])
+        previous_task = Task.objects.before(self.last_task)
+        self.assertEqual(previous_task, self.middle_task)
 
     def test_returns_none_if_after_on_last(self):
-        last_task = self.tasks[2]
-        next_task = Task.objects.after(last_task)
+        next_task = Task.objects.after(self.last_task)
         self.assertIsNone(next_task)
 
     def test_returns_none_if_previous_on_first(self):
-        first_task = self.tasks[0]
-        previous_task = Task.objects.before(first_task)
+        previous_task = Task.objects.before(self.first_task)
         self.assertIsNone(previous_task)
 
 
@@ -39,28 +36,25 @@ class TestOrderableRelatedManager(TestCase):
         cls.task = Task()
         cls.task.save()
 
-        cls.sub_tasks = []
+        sub_tasks = []
         for i in range(3):
             sub = SubTask(task=cls.task, sort_order=i)
             sub.save()
-            cls.sub_tasks.append(sub)
+            sub_tasks.append(sub)
+        cls.first_sub_task, cls.middle_sub_task, cls.last_sub_task = sub_tasks
 
     def test_gets_next(self):
-        first_sub_task = self.sub_tasks[0]
-        next_sub_task = self.task.subtask_set.after(first_sub_task)
-        self.assertEqual(next_sub_task, self.sub_tasks[1])
+        next_sub_task = self.task.subtask_set.after(self.first_sub_task)
+        self.assertEqual(next_sub_task, self.middle_sub_task)
 
     def test_gets_previous(self):
-        last_sub_task = self.sub_tasks[2]
-        previous_sub_task = self.task.subtask_set.before(last_sub_task)
-        self.assertEqual(previous_sub_task, self.sub_tasks[1])
+        previous_sub_task = self.task.subtask_set.before(self.last_sub_task)
+        self.assertEqual(previous_sub_task, self.middle_sub_task)
 
     def test_returns_none_if_after_on_last(self):
-        last_sub_task = self.sub_tasks[2]
-        next_sub_task = self.task.subtask_set.after(last_sub_task)
+        next_sub_task = self.task.subtask_set.after(self.last_sub_task)
         self.assertIsNone(next_sub_task)
 
     def test_returns_none_if_previous_on_first(self):
-        first_sub_task = self.sub_tasks[0]
-        previous_sub_task = self.task.subtask_set.before(first_sub_task)
+        previous_sub_task = self.task.subtask_set.before(self.first_sub_task)
         self.assertIsNone(previous_sub_task)
