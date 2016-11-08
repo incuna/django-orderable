@@ -3,7 +3,7 @@ from django.db import models
 
 class OrderableManager(models.Manager):
     '''
-    Adds additional functionality to `Orderable.objects` allow access to the next and
+    Adds additional functionality to `Orderable.objects` providing access to the next and
     previous ordered object within the queryset.
     '''
     def before(self, orderable):
