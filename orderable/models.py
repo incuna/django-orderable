@@ -34,38 +34,24 @@ class Orderable(models.Model):
                 return ['%s_id' % f for f in unique_fields]
         return []
 
-    def get_filters(self):
-        """
-        Build a dictionary of filter kwargs.
-
-        Used to select records that are `unique_together`.
-        """
-        unique_fields = self.get_unique_fields()
-        if unique_fields:
-            kwargs = {}
-            for field in unique_fields:
-                kwargs[field] = getattr(self, field)
-            return kwargs
-
     def get_filtered_manager(self):
-        """Return manager which may already have filtered results as needed."""
-        obj = type(self)
-        extra_kwargs = self.get_filters()
-        if extra_kwargs:
-            return obj.objects.filter(**extra_kwargs)
-        return obj.objects
+        manager = self.__class__.objects
+        kwargs = {}
+        for field in self.get_unique_fields():
+            kwargs[field] = getattr(self, field)
+        return manager.filter(**kwargs)
 
     def next(self):
         if not self.sort_order:
             return None
 
-        return self.get_filtered_manager().after(self)
+        return self.objects.after(self)
 
     def prev(self):
         if not self.sort_order:
             return None
 
-        return self.get_filtered_manager().before(self)
+        return self.objects.before(self)
 
     @staticmethod
     def _update(qs):
