@@ -36,9 +36,7 @@ class Orderable(models.Model):
 
     def get_filtered_manager(self):
         manager = self.__class__.objects
-        kwargs = {}
-        for field in self.get_unique_fields():
-            kwargs[field] = getattr(self, field)
+        kwargs = {field: getattr(self, field) for field in self.get_unique_fields()}
         return manager.filter(**kwargs)
 
     def next(self):

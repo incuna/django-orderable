@@ -6,11 +6,7 @@ from .models import SubTask, Task
 class TestOrderableManager(TestCase):
     @classmethod
     def setUpTestData(cls):
-        tasks = []
-        for i in range(3):
-            task = Task(sort_order=i)
-            task.save()
-            tasks.append(task)
+        tasks = [Task.objects.create(sort_order=i) for i in range(3)]
         cls.first_task, cls.middle_task, cls.last_task = tasks
 
     def test_gets_next(self):
@@ -33,14 +29,11 @@ class TestOrderableManager(TestCase):
 class TestOrderableRelatedManager(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.task = Task()
-        cls.task.save()
+        cls.task = Task.objects.create()
 
-        sub_tasks = []
-        for i in range(3):
-            sub = SubTask(task=cls.task, sort_order=i)
-            sub.save()
-            sub_tasks.append(sub)
+        sub_tasks = [
+            SubTask.objects.create(task=cls.task, sort_order=i) for i in range(3)
+        ]
         cls.first_sub_task, cls.middle_sub_task, cls.last_sub_task = sub_tasks
 
     def test_gets_next(self):
