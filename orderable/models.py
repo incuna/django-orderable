@@ -1,6 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, models, transaction
 
+from .managers import OrderableManager
+
 
 class Orderable(models.Model):
     """
@@ -16,6 +18,8 @@ class Orderable(models.Model):
     make a nice jquery admin interface.
     """
     sort_order = models.IntegerField(blank=True, db_index=True)
+
+    objects = OrderableManager()
 
     class Meta:
         abstract = True
