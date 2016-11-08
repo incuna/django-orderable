@@ -45,13 +45,13 @@ class Orderable(models.Model):
         if not self.sort_order:
             return None
 
-        return self.objects.after(self)
+        return self.get_filtered_manager().after(self)
 
     def prev(self):
         if not self.sort_order:
             return None
 
-        return self.objects.before(self)
+        return self.get_filtered_manager().before(self)
 
     @staticmethod
     def _update(qs):

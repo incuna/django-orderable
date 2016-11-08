@@ -1,14 +1,7 @@
-from django.db import models
+from django.db.models import manager
+
+from .querysets import OrderableQueryset
 
 
-class OrderableManager(models.Manager):
-    """
-    Adds additional functionality to `Orderable.objects`.
-
-    Provides access to the next and previous ordered object within the queryset.
-    """
-    def before(self, orderable):
-        return self.filter(sort_order__lt=orderable.sort_order).last()
-
-    def after(self, orderable):
-        return self.filter(sort_order__gt=orderable.sort_order).first()
+class OrderableManager(manager.BaseManager.from_queryset(OrderableQueryset)):
+    pass
