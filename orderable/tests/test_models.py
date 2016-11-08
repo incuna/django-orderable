@@ -225,7 +225,6 @@ class TestSubTask(TestCase):
         self.assertIsNone(subtask_3.prev())
         self.assertIsNone(subtask_3.next())
 
-
     @given(lists(integers(min_value=1), min_size=1, unique=True))
     @example([2, 3, 1])
     @example([2, 3, 4])
