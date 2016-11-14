@@ -1,3 +1,11 @@
+
+Upcoming Changes
+================
+
+* Drop support for django<1.8
+* Added before and after to the querset to return the next item in the set.
+    - example usage: `ordered_queryset.objects.after(ordered_object)`
+
 v4.0.4
 ======
 

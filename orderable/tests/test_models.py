@@ -212,6 +212,19 @@ class TestSubTask(TestCase):
         subtask_2.save()
         self.assertSequenceEqual(task.subtask_set.all(), [subtask, subtask_2])
 
+    def test_next_and_prev(self):
+        task = Task.objects.create()
+        task_2 = Task.objects.create()
+        subtask = SubTask.objects.create(task=task)
+        subtask_2 = SubTask.objects.create(task=task)
+        subtask_3 = SubTask.objects.create(task=task_2)
+
+        self.assertEqual(subtask.next(), subtask_2)
+        self.assertIsNone(subtask_2.next())
+
+        self.assertIsNone(subtask_3.prev())
+        self.assertIsNone(subtask_3.next())
+
     @given(lists(integers(min_value=1), min_size=1, unique=True))
     @example([2, 3, 1])
     @example([2, 3, 4])
