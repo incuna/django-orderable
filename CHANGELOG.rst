@@ -6,6 +6,11 @@ Upcoming Changes
 * Added before and after to the querset to return the next item in the set.
     - example usage: `ordered_queryset.objects.after(ordered_object)`
 
+v4.0.5
+======
+
+* Use `attr` to set input field values in the DOM instead of `val`, fixing the drag/drop behaviour.
+
 v4.0.4
 ======
 
