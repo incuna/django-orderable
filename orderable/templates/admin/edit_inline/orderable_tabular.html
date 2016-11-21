@@ -47,7 +47,6 @@ $(document).ready(function() {
     // Do the draggable
     $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody").sortable({
         'axis': 'y',
-        // 'containment': 'parent',
         'cursor': 'crosshair',
         'items': 'tr.has_original',
         'handle': '.sorthandletd',
@@ -55,7 +54,6 @@ $(document).ready(function() {
         'update': function(sorted) {
 
             var cereal = $(this).sortable("serialize");
-            //console.log(cereal);
 
             var classflip = 1;
             var i = 0;
@@ -70,7 +68,7 @@ $(document).ready(function() {
                 }
                 classflip = !classflip;
 
-                $(" td.field-sort_order :input", this).val(order_array[i]);
+                $(" td.field-sort_order :input", this).attr("value", order_array[i]);
                 i += 1;
             });
 
