@@ -13,3 +13,6 @@ test:
 
 release:
 	python setup.py register -r pypi sdist bdist_wheel upload -r pypi
+
+mypy:
+	mypy . --silent-imports

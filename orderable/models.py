@@ -1,7 +1,10 @@
+from typing import Optional, List
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, models, transaction
 
 from .managers import OrderableManager
+from .querysets import OrderableQueryset
 
 
 class Orderable(models.Model):
@@ -25,7 +28,7 @@ class Orderable(models.Model):
         abstract = True
         ordering = ['sort_order']
 
-    def get_unique_fields(self):
+    def get_unique_fields(self) -> List[str]:
         """List field names that are unique_together with `sort_order`."""
         for unique_together in self._meta.unique_together:
             if 'sort_order' in unique_together:
@@ -34,25 +37,25 @@ class Orderable(models.Model):
                 return ['%s_id' % f for f in unique_fields]
         return []
 
-    def get_filtered_manager(self):
-        manager = self.__class__.objects
+    def get_filtered_manager(self) -> OrderableQueryset:
+        manager = self.__class__.objects  # type: ignore self.__class__ is 'type' not 'Orderable'
         kwargs = {field: getattr(self, field) for field in self.get_unique_fields()}
         return manager.filter(**kwargs)
 
-    def next(self):
+    def next(self) -> Optional['Orderable']:
         if not self.sort_order:
             return None
 
         return self.get_filtered_manager().after(self)
 
-    def prev(self):
+    def prev(self) -> Optional['Orderable']:
         if not self.sort_order:
             return None
 
         return self.get_filtered_manager().before(self)
 
     @staticmethod
-    def _update(qs):
+    def _update(qs: OrderableQueryset) -> None:
         """
         Increment the sort_order in a queryset.
 
@@ -65,7 +68,7 @@ class Orderable(models.Model):
             for obj in qs.order_by('-sort_order'):
                 qs.filter(pk=obj.pk).update(sort_order=models.F('sort_order') + 1)
 
-    def _save(self, objects, old_pos, new_pos):
+    def _save(self, objects: OrderableQueryset, old_pos: int, new_pos: int) -> None:
         """WARNING: Intensive giggery-pokery zone."""
         to_shift = objects.exclude(pk=self.pk) if self.pk else objects
 
@@ -101,18 +104,18 @@ class Orderable(models.Model):
             to_shift.update(sort_order=models.F('sort_order') - 1)
             self.sort_order = new_pos
 
-    def _move_to_end(self, objects):
+    def _move_to_end(self, objects: OrderableQueryset) -> None:
         """Temporarily save `self.sort_order` elsewhere (max_obj)."""
         max_obj = objects.all().aggregate(models.Max('sort_order'))['sort_order__max']
         self.sort_order = max_obj + 1 if max_obj else 1
 
-    def _unique_togethers_changed(self):
+    def _unique_togethers_changed(self) -> bool:
         for field in self.get_unique_fields():
             if getattr(self, '_original_%s' % field, False):
                 return True
         return False
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs) -> None:
         """Keep the unique order in sync."""
         objects = self.get_filtered_manager()
         old_pos = getattr(self, '_original_sort_order', None)
@@ -134,12 +137,13 @@ class Orderable(models.Model):
         # Call the "real" save() method.
         super(Orderable, self).save(*args, **kwargs)
 
-    def sort_order_display(self):
+    def sort_order_display(self) -> str:
         template = '<span id="neworder-{}" class="sorthandle">{}</span>'
         return template.format(self.id, self.sort_order)
-    sort_order_display.allow_tags = True
-    sort_order_display.short_description = 'Order'
-    sort_order_display.admin_order_field = 'sort_order'
+    # Ignore typing on the attributes: Django properties
+    sort_order_display.allow_tags = True  # type: ignore
+    sort_order_display.short_description = 'Order'  # type: ignore
+    sort_order_display.admin_order_field = 'sort_order'  # type: ignore
 
     def __setattr__(self, attr, value):
         """
