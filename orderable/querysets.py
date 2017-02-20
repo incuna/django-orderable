@@ -40,10 +40,18 @@ class OrderableQueryset(models.QuerySet):
         # update() later (since values_list() is lazy).
         orders = list(objects_to_sort.values_list('sort_order', flat=True))
 
+        # Check there are no unrecognised entries in the object_pks list. If so,
+        # throw an error.
+        if len(orders) != len(object_pks):
+            message = 'The following object_pks are not in this queryset: {}'.format(
+                [pk for pk in object_pks if not objects_to_sort.filter(pk=pk).exists()]
+            )
+            raise TypeError(message)
+
         with transaction.atomic():
             objects_to_sort.update(sort_order=models.F('sort_order') + max_value)
-            for i, pk in enumerate(object_pks):
-                self.filter(pk=pk).update(sort_order=orders[i])
+            for pk, order in zip(object_pks, orders):
+                self.filter(pk=pk).update(sort_order=order)
 
         # Return the operated-on queryset for convenience.
         return objects_to_sort
