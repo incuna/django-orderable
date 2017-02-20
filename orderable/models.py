@@ -134,6 +134,13 @@ class Orderable(models.Model):
         # Call the "real" save() method.
         super(Orderable, self).save(*args, **kwargs)
 
+    def _pass_through_save(self, *args, **kwargs):
+        """
+        Skip the order fixing. Used for mass updates when you just need to write to
+        the sort_order field directly without any magic.
+        """
+        super(Orderable, self).save(*args, **kwargs)
+
     def sort_order_display(self):
         template = '<span id="neworder-{}" class="sorthandle">{}</span>'
         return template.format(self.id, self.sort_order)
