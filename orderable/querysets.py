@@ -15,7 +15,7 @@ class OrderableQueryset(models.QuerySet):
     def after(self, orderable):
         return self.filter(sort_order__gt=orderable.sort_order).first()
 
-    def set_orders(self, object_pks, *args, **kwargs):
+    def set_orders(self, object_pks):
         """
         Perform a mass update of sort_orders across the full queryset.
         Accepts a list, object_pks, of the intended order for the objects.
