@@ -31,8 +31,10 @@ class OrderableQueryset(models.QuerySet):
           had before calling this method, so they get rearranged in place.
         Performs O(n) queries.
         """
-        max_value = self.model.objects.count()
         objects_to_sort = self.filter(pk__in=object_pks)
+        max_value = self.model.objects.all().aggregate(
+            models.Max('sort_order')
+        )['sort_order__max']
 
         # Call list() on the values right away, so they don't get affected by the
         # update() later (since values_list() is lazy).
