@@ -44,4 +44,4 @@ class OrderableQueryset(models.QuerySet):
                 self.filter(pk=pk).update(sort_order=orders[i])
 
         # Return the operated-on queryset for convenience.
-        return self
+        return objects_to_sort
