@@ -21,29 +21,27 @@ class OrderableQueryset(models.QuerySet):
         Accepts a list, object_pks, of the intended order for the objects.
 
         Works as follows:
-        - Compile a list of all sort orders in the queryset.
+        - Compile a list of all sort orders in the queryset. Leave out anything that
+          isn't in the object_pks list - this deals with pagination and any
+          inconsistencies.
         - Get the maximum among all model object sort orders. Update the queryset to add
           it to all the existing sort order values. This lifts them 'out of the way' of
           unique_together clashes when setting the intended sort orders.
-        - Set the sort order on each object.
+        - Set the sort order on each object. Use only sort_order values that the objects
+          had before calling this method, so they get rearranged in place.
         Performs O(n) queries.
         """
-        orders = self.values_list('sort_order', flat=True)  # will be sorted
-        print(orders)
-        if len(object_pks) != len(orders):
-            raise TypeError(
-                'A list of object pks supplied to OrderableQueryset.set_orders() must ' +
-                'be of the same length as the queryset itself.'
-            )
-
         max_value = self.model.objects.count()
-        self.update(sort_order=models.F('sort_order') + max_value)
+        objects_to_sort = self.filter(pk__in=object_pks)
+
+        # Call list() on the values right away, so they don't get affected by the
+        # update() later (since values_list() is lazy).
+        orders = list(objects_to_sort.values_list('sort_order', flat=True))
 
         with transaction.atomic():
+            objects_to_sort.update(sort_order=models.F('sort_order') + max_value)
             for i, pk in enumerate(object_pks):
-                obj = self.get(pk=pk)
-                obj.sort_order = orders[i]
-                obj._pass_through_save()
+                self.filter(pk=pk).update(sort_order=orders[i])
 
         # Return the operated-on queryset for convenience.
         return self
