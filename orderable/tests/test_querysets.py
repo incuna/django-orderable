@@ -44,3 +44,32 @@ class TestOrderableQueryset(TestCase):
             Task.objects.values_list('sort_order', flat=True),
             [1, 4, 5, 8],
         )
+
+    def test_set_orders_performance(self):
+        """
+        When only some Tasks are mentioned in the object_pks list, they're swapped around
+        and the others are unaffected.
+        """
+        Task.objects.create(sort_order=1, pk=1)
+        Task.objects.create(sort_order=4, pk=2)
+        Task.objects.create(sort_order=5, pk=3)
+        Task.objects.create(sort_order=8, pk=4)
+
+        with self.assertNumQueries(7):
+            """
+            SELECT MAX("tests_task"."sort_order") AS "sort_order__max" FROM "tests_task"
+            SELECT "tests_task"."sort_order"
+              FROM "tests_task"
+              WHERE "tests_task"."id" IN (3, 2) ORDER BY "tests_task"."sort_order" ASC
+
+            SAVEPOINT "s47832829518016_x11457"
+            UPDATE "tests_task"
+              SET "sort_order" = ("tests_task"."sort_order" + 8)
+              WHERE "tests_task"."id" IN (3, 2)
+
+            UPDATE "tests_task" SET "sort_order" = 4 WHERE "tests_task"."id" = 3
+            UPDATE "tests_task" SET "sort_order" = 5 WHERE "tests_task"."id" = 2
+
+            RELEASE SAVEPOINT "s47832829518016_x11457"
+            """
+            Task.objects.set_orders([3, 2])

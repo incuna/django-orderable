@@ -43,8 +43,9 @@ class OrderableQueryset(models.QuerySet):
         # Check there are no unrecognised entries in the object_pks list. If so,
         # throw an error.
         if len(orders) != len(object_pks):
+            pks = set(objects_to_sort.values_list('pk', flat=True))
             message = 'The following object_pks are not in this queryset: {}'.format(
-                [pk for pk in object_pks if not objects_to_sort.filter(pk=pk).exists()]
+                [pk for pk in object_pks if pk not in pks]
             )
             raise TypeError(message)
 
