@@ -54,6 +54,8 @@ class OrderableQueryset(models.QuerySet):
         with transaction.atomic():
             objects_to_sort.update(sort_order=models.F('sort_order') + max_value)
             for pk, order in zip(object_pks, orders):
+                # Use update() to save a query per item and dodge the insertion sort
+                # code in save().
                 self.filter(pk=pk).update(sort_order=order)
 
         # Return the operated-on queryset for convenience.
