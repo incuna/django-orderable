@@ -1,10 +1,12 @@
 
-Upcoming Changes
-================
+v5.0.0
+======
 
-* Drop support for django<1.8
-* Added before and after to the querset to return the next item in the set.
+* Drop support for django versions before 1.8.
+* Add `before` and `after` to `OrderableQueryset` to return the next item in the set.
     - example usage: `ordered_queryset.objects.after(ordered_object)`
+* Add `OrderableQueryset.set_orders()` to perform a mass rearrangement of items. This now requires custom model managers to inherit from `OrderableManager`.
+* Add `_pass_through_save()` to `Orderable`. This allows you to skip the insertion sorting performed by the `save()` method, such as when updating multiple objects at once to rearrange them. (`set_orders()` uses it.)
 
 v4.0.5
 ======

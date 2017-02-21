@@ -55,12 +55,8 @@ class OrderableAdmin(admin.ModelAdmin):
             raise PermissionDenied
 
         if request.method == "POST":
-            neworder = 1
-            for object_id in request.POST.getlist('neworder[]'):
-                obj = model.objects.get(pk=object_id)
-                obj.sort_order = neworder
-                obj.save()
-                neworder += 1
+            object_pks = request.POST.getlist('neworder[]')
+            model.objects.set_orders(object_pks)
 
         return HttpResponse("OK")
 
