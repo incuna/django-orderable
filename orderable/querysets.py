@@ -41,7 +41,9 @@ class OrderableQueryset(models.QuerySet):
         orders = list(objects_to_sort.values_list('sort_order', flat=True))
 
         # Check there are no unrecognised entries in the object_pks list. If so,
-        # throw an error.
+        # throw an error. We only have to check that they're the same length because
+        # orders is built using only entries in object_pks, and all the pks are unique,
+        # so if their lengths are the same, the elements must match up exactly.
         if len(orders) != len(object_pks):
             pks = set(objects_to_sort.values_list('pk', flat=True))
             message = 'The following object_pks are not in this queryset: {}'.format(
