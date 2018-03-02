@@ -1,3 +1,7 @@
+v5.0.1
+======
+
+* Fix `sort_order_display` in Django admin change_list view.
 
 v5.0.0
 ======
