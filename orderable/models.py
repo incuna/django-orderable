@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError, models, transaction
+from django.utils.html import format_html
 
 from .managers import OrderableManager
 
@@ -135,8 +136,11 @@ class Orderable(models.Model):
         super(Orderable, self).save(*args, **kwargs)
 
     def sort_order_display(self):
-        template = '<span id="neworder-{}" class="sorthandle">{}</span>'
-        return template.format(self.id, self.sort_order)
+        return format_html(
+            '<span id="neworder-{}" class="sorthandle">{}</span>',
+            self.id, self.sort_order,
+        )
+
     sort_order_display.allow_tags = True
     sort_order_display.short_description = 'Order'
     sort_order_display.admin_order_field = 'sort_order'
