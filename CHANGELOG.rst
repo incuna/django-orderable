@@ -1,4 +1,4 @@
-v6.0.0 (unreleased)
+v6.0.0
 ======
 
 * Drop support for django 1.10 and below. Things probably still work on the old versions, we're just no longer supporting them.
