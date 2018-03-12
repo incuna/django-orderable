@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 import django
 from django.conf import settings
+from django.test.runner import DiscoverRunner
 
 
 settings.configure(
@@ -18,17 +19,7 @@ settings.configure(
 )
 
 
-if django.VERSION >= (1, 7):
-    django.setup()
-
-
-DJANGO_18 = '.'.join(map(str, django.VERSION)) >= '1.8'
-
-
-try:
-    from django.test.runner import DiscoverRunner
-except ImportError:
-    from discover_runner.runner import DiscoverRunner
+django.setup()
 
 
 if __name__ == "__main__":
@@ -61,8 +52,7 @@ if __name__ == "__main__":
         'keepdb': options.keepdb,
         'reverse': options.reverse,
     }
-    if DJANGO_18:
-        runner_kwargs['debug_sql'] = options.debug_sql
+    runner_kwargs['debug_sql'] = options.debug_sql
     test_runner = DiscoverRunner(**runner_kwargs)
     failures = test_runner.run_tests(['orderable'])
     if failures:

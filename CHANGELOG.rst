@@ -1,6 +1,9 @@
-v5.0.1
+v6.0.0 (unreleased)
 ======
 
+* Drop support for django 1.10 and below. Things probably still work on the old versions, we're just no longer supporting them.
+* Drop support for Python 3.3. Again, it probably still works, just not supported.
+* Add django 2.0 support (nothing significant actually changed -- only tests).
 * Fix `sort_order_display` in Django admin change_list view.
 
 v5.0.0

@@ -12,7 +12,7 @@ class Task(Orderable):
 
 class SubTask(Orderable):
     """An orderable model with unique_together."""
-    task = models.ForeignKey('Task')
+    task = models.ForeignKey('Task', models.CASCADE)
 
     class Meta(Orderable.Meta):
         unique_together = ('task', 'sort_order')
