@@ -62,9 +62,13 @@ jQuery and jQuery UI are used in the Admin for the draggable UI. You may overrid
 
 ## Notes
 
-### Metaclasses
+### `class Meta`
 
-If your subclass of Orderable has a Metaclass then make sure it subclasses the Orderable one so the model is sorted by `sort_order`.
+If your subclass of `Orderable` defines [`class Meta`](https://docs.djangoproject.com/en/2.0/ref/models/options/) then make sure it subclasses `Orderable.Meta` one so the model is sorted by `sort_order`. ie:
+
+    class MyOrderable(Orderable):
+        class Meta(Orderable.Meta):
+            ...
 
 ### Custom Managers
 
