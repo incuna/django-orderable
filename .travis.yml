@@ -1,24 +1,39 @@
 language: python
+dist: xenial
+sudo: true
+services:
+  - postgresql
 python:
   - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7"
 env:
   - DJANGO='django>=1.11,<2'
   - DJANGO='django>=2,<2.1'
+  - DJANGO='django~=2.1.0'
   - DJANGO='--pre django'
 matrix:
   exclude:
-   - python: "2.7"
-     env: DJANGO='django>=2,<2.1'
-   - python: "3.4"
-     env: DJANGO='--pre django'
+    - python: "2.7"
+      env: DJANGO='--pre django'
+    - python: "2.7"
+      env: DJANGO='django~=2.1.0'
+    - python: "2.7"
+      env: DJANGO='django>=2,<2.1'
+    - python: "3.4"
+      env: DJANGO='django~=2.1.0'
+    - python: "3.4"
+      env: DJANGO='--pre django'
+    - python: "3.7"
+      env: DJANGO='django>=1.11,<2'
   allow_failures:
     - env: DJANGO='--pre django'
   fast_finish: true
-install:
+before_script:
   - psql -c 'CREATE DATABASE orderable' -U postgres;
+install:
   - pip install $DJANGO
   - pip install -r requirements.txt
   - pip install -e .
