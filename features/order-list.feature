@@ -13,3 +13,17 @@ Feature: Ordering on the list page
       |  2 |
       |  3 |
       |  1 |
+
+  Scenario: Move an item to the top of the list
+    Given the following items:
+      | pk |
+      |  1 |
+      |  2 |
+      |  3 |
+    And we are on the item list page
+    When item 3 is moved to position 1
+    Then the items should be ordered thus:
+      | pk |
+      |  3 |
+      |  1 |
+      |  2 |
