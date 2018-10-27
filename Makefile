@@ -9,6 +9,7 @@ help:
 test:
 	@coverage run orderable/tests/run.py
 	@coverage report -m
+	@bdd/manage.py behave
 	@flake8
 
 release:
