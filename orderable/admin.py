@@ -71,7 +71,7 @@ class OrderableTabularInline(admin.TabularInline):
     """
     jQuery orderable objects in the admin.
 
-    You'll want your object to subclass incuna.db.models.Orderable.
+    You'll want your object to subclass orderable.models.Orderable.
     """
     template = "admin/edit_inline/orderable_tabular.html"
 
