@@ -1,5 +1,5 @@
-import sys
 from argparse import ArgumentParser
+import sys
 
 import django
 from django.conf import settings
