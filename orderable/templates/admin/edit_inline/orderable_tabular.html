@@ -19,12 +19,14 @@
 $(document).ready(function() {
 
     var order_array = [];
+    var min_value = 0;
     $("#{{ inline_admin_formset.formset.prefix }}-group .tabular.inline-related tbody tr.has_original td.field-sort_order :input").each(function() {
-            var id = $(this).val();
-            order_array.push(id);
-            $(this).parent().append("<span id='{{ inline_admin_formset.formset.prefix }}-neworder-" + id + "' class='sorthandle'>Order</span>");;
-            $(this).hide();
-        });
+        var id = Math.max(min_value, $(this).val());  // Ensure that the values increase.
+        min_value = id + 1;
+        order_array.push(id);
+        $(this).parent().append("<span id='{{ inline_admin_formset.formset.prefix }}-neworder-" + id + "' class='sorthandle'>Order</span>");;
+        $(this).hide();
+    });
 
 
     // Steal the draghandle's id and apply to the row

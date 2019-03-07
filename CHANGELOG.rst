@@ -1,3 +1,8 @@
+UPCOMING
+========
+
+* Fix edit inline issues causing reordering to fail when items have equal sort_order values.
+
 v6.0.0
 ======
 
