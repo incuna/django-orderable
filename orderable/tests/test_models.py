@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from hypothesis import example, given
 from hypothesis.extra.django import TestCase
 from hypothesis.strategies import integers, lists
@@ -237,3 +238,40 @@ class TestSubTask(TestCase):
 
         subtask.sort_order = 2
         subtask.save()
+
+    def test_validate_unique(self):
+        """validate_unique should validate when sort_order conflicts."""
+        task = Task.objects.create()
+        subtask = SubTask.objects.create(task=task, sort_order=1)
+        SubTask.objects.create(task=task, sort_order=2)
+
+        subtask.sort_order = 2
+        try:
+            subtask.validate_unique()
+        except ValidationError:
+            self.fail("SubTask.clean() raised ValidationError unexpectedly!")
+
+    def test_validate_unique_exclude_sort_order(self):
+        """validate_unique should validate when sort_order excluded."""
+        task = Task.objects.create()
+        subtask = SubTask.objects.create(task=task, sort_order=1)
+        SubTask.objects.create(task=task, sort_order=2)
+
+        subtask.sort_order = 2
+        try:
+            subtask.validate_unique(exclude=('sort_order',))
+        except ValidationError:
+            self.fail("SubTask.clean() raised ValidationError unexpectedly!")
+
+    def test_validate_unique_not_unique_sort_order(self):
+        """
+        validate_unique should validate when sort_order not in unique_together.
+        """
+        task = Task.objects.create(sort_order=1)
+        Task.objects.create(sort_order=2)
+
+        task.sort_order = 1
+        try:
+            task.validate_unique()
+        except ValidationError:
+            self.fail("Task.clean() raised ValidationError unexpectedly!")

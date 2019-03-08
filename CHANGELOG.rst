@@ -1,3 +1,8 @@
+UPCOIMING
+======
+
+* Add Orderable.validate_unique to exclude `sort_order` when it is unique_together with something.
+
 v6.0.1
 ======
 

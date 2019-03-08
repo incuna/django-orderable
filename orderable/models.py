@@ -52,6 +52,23 @@ class Orderable(models.Model):
 
         return self.get_filtered_manager().before(self)
 
+    def validate_unique(self, exclude=None):
+        if self._is_sort_order_unique_together_with_something():
+            exclude = exclude or []
+            if 'sort_order' not in exclude:
+                exclude.append('sort_order')
+        return super(Orderable, self).validate_unique(exclude=exclude)
+
+    def _is_sort_order_unique_together_with_something(self):
+        """
+        Is the sort_order field unique_together with something
+        """
+        unique_together = self._meta.unique_together
+        for fields in unique_together:
+            if 'sort_order' in fields and len(fields) > 1:
+                return True
+        return False
+
     @staticmethod
     def _update(qs):
         """
