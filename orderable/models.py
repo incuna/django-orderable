@@ -57,7 +57,7 @@ class Orderable(models.Model):
             exclude = exclude or []
             if 'sort_order' not in exclude:
                 exclude.append('sort_order')
-        return super().validate_unique(exclude=exclude)
+        return super(Orderable, self).validate_unique(exclude=exclude)
 
     def _is_sort_order_unique_together_with_something(self):
         """
