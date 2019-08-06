@@ -49,7 +49,7 @@
                 'forcePlaceholderSize': true,
                 'update': function(sorted) {
 
-                    var cereal = $(this).sortable("serialize");
+                    var cereal = $(this).sortable("serialize", {expression:(/(.+)[_](.+)/)});
                     cereal += '&csrfmiddlewaretoken=' + $("input[name=csrfmiddlewaretoken]").val();
 
                     var classflip = 1;
