@@ -1,6 +1,11 @@
 language: python
 dist: xenial
 sudo: true
+addons:
+  chrome: stable
+  apt:
+    packages:
+      - chromium-chromedriver
 services:
   - postgresql
 python:
@@ -32,6 +37,8 @@ matrix:
     - env: DJANGO='--pre django'
   fast_finish: true
 before_script:
+  # Add link to ChromeDriver in PATH
+  - ln --symbolic /usr/lib/chromium-browser/chromedriver "${HOME}/bin/chromedriver"
   - psql -c 'CREATE DATABASE orderable' -U postgres;
 install:
   - pip install $DJANGO
