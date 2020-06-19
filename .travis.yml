@@ -21,13 +21,21 @@ matrix:
     - python: "2.7"
       env: DJANGO='--pre django'
     - python: "2.7"
-      env: DJANGO='django~=2.1.0'
+      env: DJANGO='django>=3<3.1'
+    - python: "2.7"
+      env: DJANGO='django>=2.2,<3'
+    - python: "2.7"
+      env: DJANGO='django>=2.1,<2.2'
     - python: "2.7"
       env: DJANGO='django>=2,<2.1'
     - python: "3.4"
-      env: DJANGO='django~=2.1.0'
-    - python: "3.4"
       env: DJANGO='--pre django'
+    - python: "3.4"
+      env: DJANGO='django>=3<3.1'
+    - python: "3.4"
+      env: DJANGO='django>=2.2,<3'
+    - python: "3.4"
+      env: DJANGO='django>=2.1,<2.2'
     - python: "3.7"
       env: DJANGO='django>=1.11,<2'
   allow_failures:
