@@ -1,7 +1,9 @@
-UPCOIMING
+v6.1.0
 ======
 
 * Add Orderable.validate_unique to exclude `sort_order` when it is unique_together with something.
+* Change staticfiles to static for Django 3.0
+* Add Django 2.3 and 3 to TravisCI build
 
 v6.0.1
 ======
