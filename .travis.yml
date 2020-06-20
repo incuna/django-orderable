@@ -1,6 +1,6 @@
 language: python
+os: linux
 dist: xenial
-sudo: true
 services:
   - postgresql
 python:
@@ -16,7 +16,7 @@ env:
   - DJANGO='django>=2.2,<3'
   - DJANGO='django>=3<3.1'
   - DJANGO='--pre django'
-matrix:
+jobs:
   exclude:
     - python: "2.7"
       env: DJANGO='--pre django'
