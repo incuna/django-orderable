@@ -12,4 +12,5 @@ test:
 	@flake8
 
 release:
-	python setup.py register -r pypi sdist bdist_wheel upload -r pypi
+	python setup.py register -r pypi sdist bdist_wheel
+	twine upload dist/*

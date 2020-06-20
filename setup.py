@@ -11,6 +11,7 @@ setup(
     author='Incuna Ltd',
     author_email='admin@incuna.com',
     url='https://github.com/incuna/django-orderable',
+    long_description_content_type='text/markdown',
     long_description=open('README.md').read(),
     license='BSD',
     classifiers=[
