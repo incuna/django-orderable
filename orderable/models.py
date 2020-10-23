@@ -154,7 +154,7 @@ class Orderable(models.Model):
 
     def sort_order_display(self):
         return format_html(
-            '<span id="neworder-{}" class="sorthandle">{}</span>',
+            '<span id="neworder_{}" class="sorthandle">{}</span>',
             self.id, self.sort_order,
         )
 
