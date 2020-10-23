@@ -1,3 +1,8 @@
+v6.1.1
+======
+
+* Fix UUID as Primary key.
+
 v6.1.0
 ======
 
