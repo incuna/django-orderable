@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
+from django.urls import path
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_protect
 
@@ -20,18 +21,13 @@ class OrderableAdmin(admin.ModelAdmin):
     change_list_template = "admin/orderable_change_list.html"
 
     def get_urls(self):
-        try:
-            from django.conf.urls.defaults import url
-        except ImportError:
-            from django.conf.urls import url
-
         patterns = super(OrderableAdmin, self).get_urls()
         patterns.insert(
             # insert just before (.+) rule
             # (see django.contrib.admin.options.ModelAdmin.get_urls)
             -1,
-            url(
-                r'^reorder/$',
+            path(
+                'reorder/',
                 self.reorder_view,
                 name=self.get_url_name()
             )
