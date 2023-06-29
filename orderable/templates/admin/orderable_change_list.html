@@ -9,6 +9,11 @@
     {
         cursor: pointer;
     }
+
+    /*Fix for grappelli*/
+    .ui-sortable {
+        float: inherit !important;
+    }
 </style>
 
 {% endblock %}
@@ -22,9 +27,13 @@
         // Only add the drag-n-drop reordering if this is not a paginated object (determined by the presense of a span, which isn't the best way to do it…)
         if ($("p.paginator > span"))
         {
+            // Check grappelli prefix
+            var grappelli_prefix = window.grappelli === undefined ? "" : "grp-";
+
+            var table_select = $("#" + grappelli_prefix + "changelist table tbody");
 
             // Steal the draghandle's id and apply to the row
-            $("#changelist table tbody tr").each(function() {
+            table_select.find("tr").each(function() {
                 var id = $(".sorthandle", this).attr("id");
                 $(this).attr("id", id);
                 $(".sorthandle", this).attr("id", "");
@@ -36,12 +45,12 @@
             $(".sorthandle").html("<img src='{% static 'admin/img/drag_handle.gif' %}'' width='11' height='11' alt='Drag to reorder' />");
 
             // Force a width onto all the tds (so they drag nicely)
-            $("#changelist table tbody tr > *").each(function() {
+            table_select.find("tr > *").each(function() {
                 $(this).width($(this).width())
             });
 
             // Do the draggable
-            $("#changelist table tbody").sortable({
+            table_select.sortable({
                 'axis': 'y',
                 // 'containment': 'parent',
                 'cursor': 'crosshair',
@@ -53,7 +62,7 @@
                     cereal += '&csrfmiddlewaretoken=' + $("input[name=csrfmiddlewaretoken]").val();
 
                     var classflip = 1;
-                    $("#changelist table tbody tr").each(function() {
+                    table_select.find("tr").each(function() {
                         // redraw the tabel striping
                         $(this).removeClass("row1 row2");
                         if (classflip) {
@@ -70,11 +79,7 @@
                     $.ajax({
                         url: "reorder/",
                         type: "POST",
-                        data: cereal/*,
-                         success: function(feedback) {
-                         console.log(feedback);
-                         // $('data').html(feedback);
-                         }*/
+                        data: cereal
                     });
                 }
 
