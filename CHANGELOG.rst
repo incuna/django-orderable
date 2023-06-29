@@ -1,3 +1,8 @@
+v6.1.2
+======
+
+* Replace django.conf.url with django.urls.path
+
 v6.1.1
 ======
 

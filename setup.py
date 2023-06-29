@@ -5,7 +5,7 @@ setup(
     name='django-orderable',
     packages=find_packages(),
     include_package_data=True,
-    version='6.1.1',
+    version='6.1.2',
     description='Add manual sort order to Django objects via an abstract base '
                 'class and admin classes.',
     author='Incuna Ltd',
